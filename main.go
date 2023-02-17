@@ -27,34 +27,48 @@ func main() {
 		fmt.Println("Login successful!!")
 	}
 
-	// Find existing sets
-	setsResponse := &SetsResponse{}
-	resp, _ = client.R().
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
-		SetResult(setsResponse).
-		Get(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets", authToken.UserToken))
-
-	if resp.StatusCode() == 200 {
-		fmt.Println("Sets Found: ", resp)
-		fmt.Println(resp)
-	}
+	//Get sets again
+	GetUserSets(client, apiKey, authToken)
 
 	//Add set
-	resp, _ = client.R().
+	StoreUserSet(client, apiKey, authToken)
+
+	//Get sets again
+	GetUserSets(client, apiKey, authToken)
+
+	//Delete all sets
+	DeleteUserSet(client, apiKey, authToken)
+
+	//Get sets again
+	GetUserSets(client, apiKey, authToken)
+}
+
+func DeleteUserSet(client *resty.Client, apiKey string, authToken *AuthToken) {
+	resp, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
+		Delete(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets/%s/", authToken.UserToken, "10276-1"))
+
+	if resp.StatusCode() == 204 {
+		fmt.Println("Deleted set: 10276-1")
+	}
+}
+
+func StoreUserSet(client *resty.Client, apiKey string, authToken *AuthToken) {
+	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		SetBody(`{"set_num":  "10276-1","quantity": "1"}`).
 		Post(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets/", authToken.UserToken))
 
-	if resp.StatusCode() != 201 {
-		fmt.Println(resp.StatusCode())
-		panic("Save failed")
+	if resp.StatusCode() == 201 {
+		fmt.Println("Sets saved: ", resp)
 	}
+}
 
-	//Get sets again
-	setsResponse = &SetsResponse{}
-	resp, _ = client.R().
+func GetUserSets(client *resty.Client, apiKey string, authToken *AuthToken) *SetsResponse {
+	setsResponse := &SetsResponse{}
+	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		SetResult(setsResponse).
@@ -62,33 +76,8 @@ func main() {
 
 	if resp.StatusCode() == 200 {
 		fmt.Println("Sets Found: ", resp)
-		fmt.Println(resp)
 	}
-
-	//Delete all sets
-	resp, _ = client.R().
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
-		SetResult(setsResponse).
-		Delete(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets/%s/", authToken.UserToken, "10276-1"))
-
-	if resp.StatusCode() == 200 {
-		fmt.Println("Deleted set: 10276-1")
-	}
-
-	//Get sets again
-	setsResponse = &SetsResponse{}
-	resp, _ = client.R().
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
-		SetResult(setsResponse).
-		Get(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets", authToken.UserToken))
-
-	if resp.StatusCode() == 200 {
-		fmt.Println("Sets Found: ", resp)
-		fmt.Println(resp)
-	}
-
+	return setsResponse
 }
 
 type AuthToken struct {
