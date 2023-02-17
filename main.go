@@ -8,6 +8,25 @@ import (
 
 func main() {
 	client := resty.New()
+	apiKey, authToken := Login(client)
+
+	//Get sets again
+	GetUserSets(client, apiKey, authToken)
+
+	//Add set
+	StoreUserSet(client, apiKey, authToken)
+
+	//Get sets again
+	GetUserSets(client, apiKey, authToken)
+
+	//Delete all sets
+	DeleteUserSet(client, apiKey, authToken)
+
+	//Get sets again
+	GetUserSets(client, apiKey, authToken)
+}
+
+func Login(client *resty.Client) (string, *AuthToken) {
 	username := os.Getenv("REBRICKABLE_USERNAME")
 	password := os.Getenv("REBRICKABLE_PASSWORD")
 	apiKey := os.Getenv("REBRICKABLE_API_KEY")
@@ -26,21 +45,7 @@ func main() {
 	if resp.StatusCode() == 200 {
 		fmt.Println("Login successful!!")
 	}
-
-	//Get sets again
-	GetUserSets(client, apiKey, authToken)
-
-	//Add set
-	StoreUserSet(client, apiKey, authToken)
-
-	//Get sets again
-	GetUserSets(client, apiKey, authToken)
-
-	//Delete all sets
-	DeleteUserSet(client, apiKey, authToken)
-
-	//Get sets again
-	GetUserSets(client, apiKey, authToken)
+	return apiKey, authToken
 }
 
 func DeleteUserSet(client *resty.Client, apiKey string, authToken *AuthToken) {
