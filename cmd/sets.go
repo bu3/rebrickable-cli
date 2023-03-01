@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/bu3/rebrickable-cli/cmd/api"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
 )
@@ -66,7 +67,7 @@ func DeleteUserSet(client *resty.Client, apiKey string, authToken string) {
 	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
-		Delete(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets/%s/", authToken, setNumber))
+		Delete(api.GetURL(fmt.Sprintf("/users/%s/sets/%s/", authToken, setNumber)))
 
 	if resp.StatusCode() == 204 {
 		fmt.Println("Deleted set: 10276-1")
@@ -78,7 +79,7 @@ func StoreUserSet(client *resty.Client, apiKey string, authToken string, setNumb
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		SetBody(fmt.Sprintf(`{"set_num":  "%s","quantity": "1"}`, setNumber)).
-		Post(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets/", authToken))
+		Post(api.GetURL(fmt.Sprintf("/users/%s/sets/", authToken)))
 
 	if resp.StatusCode() == 201 {
 		fmt.Println("Sets saved: ", resp)
@@ -91,7 +92,7 @@ func GetUserSets(client *resty.Client, apiKey string, authToken string) *SetsRes
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		SetResult(setsResponse).
-		Get(fmt.Sprintf("https://rebrickable.com/api/v3/users/%s/sets", authToken))
+		Get(api.GetURL(fmt.Sprintf("/users/%s/sets", authToken)))
 
 	if resp.StatusCode() == 200 {
 		fmt.Println("Sets Found: ", resp)

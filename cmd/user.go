@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/bu3/rebrickable-cli/cmd/api"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
@@ -22,7 +23,12 @@ var user = &cobra.Command{
 	Short: "user actions",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		client := resty.New()
-		authToken := login(client)
+		authToken, err := login(client)
+
+		if err != nil {
+			return err
+		}
+
 		ctx := context.WithValue(cmd.Context(), AuthToken, authToken.UserToken)
 		ctx = context.WithValue(ctx, ApiKey, authToken.ApiKey)
 		cmd.SetContext(ctx)
@@ -33,7 +39,7 @@ var user = &cobra.Command{
 	},
 }
 
-func login(client *resty.Client) *authToken {
+func login(client *resty.Client) (*authToken, error) {
 	username := os.Getenv("REBRICKABLE_USERNAME")
 	password := os.Getenv("REBRICKABLE_PASSWORD")
 	apiKey := os.Getenv("REBRICKABLE_API_KEY")
@@ -41,7 +47,7 @@ func login(client *resty.Client) *authToken {
 		ApiKey: apiKey,
 	}
 
-	resp, _ := client.R().
+	resp, err := client.R().
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		SetFormData(map[string]string{
@@ -49,12 +55,12 @@ func login(client *resty.Client) *authToken {
 			"password": password,
 		}).
 		SetResult(authToken).
-		Post("https://rebrickable.com/api/v3/users/_token/")
+		Post(api.GetURL("/users/_token/"))
 
-	if resp.StatusCode() == 200 {
-		fmt.Println("Login successful!!")
+	if resp.StatusCode() != 200 || err != nil {
+		fmt.Println("Login was not successful")
 	}
-	return authToken
+	return authToken, nil
 }
 
 type authToken struct {
