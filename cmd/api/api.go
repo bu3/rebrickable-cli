@@ -15,15 +15,43 @@ func GetURL(path string) string {
 	return fmt.Sprintf(apiBaseURI + path)
 }
 
-func DeleteUserSet(client *resty.Client, apiKey string, authToken string, setNumber string) {
-	url := GetURL(fmt.Sprintf("/users/%s/sets/%s/", authToken, setNumber))
+func StoreUserSetList(client *resty.Client, apiKey string, authToken string, name string) {
+	url := GetURL(fmt.Sprintf("/users/%s/setlists/", authToken))
+	resp, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
+		SetBody(fmt.Sprintf(`{"name":  "%s"}`, name)).
+		Post(url)
+
+	if resp.StatusCode() == 201 {
+		fmt.Println("Sets saved: ", resp)
+	}
+}
+
+func GetUserSetLists(client *resty.Client, apiKey string, authToken string) *SetsResponse {
+	setsResponse := &SetsResponse{}
+	url := GetURL(fmt.Sprintf("/users/%s/setlists", authToken))
+	resp, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
+		SetResult(setsResponse).
+		Get(url)
+
+	if resp.StatusCode() == 200 {
+		fmt.Println("SetLists Found: ", resp)
+	}
+	return setsResponse
+}
+
+func DeleteUserSetList(client *resty.Client, apiKey string, authToken string, id string) {
+	url := GetURL(fmt.Sprintf("/users/%s/setlists/%s/", authToken, id))
 	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		Delete(url)
 
 	if resp.StatusCode() == 204 {
-		fmt.Println("Deleted set: 10276-1")
+		fmt.Println(fmt.Sprintf("Deleted set: %s", id))
 	}
 }
 
@@ -53,6 +81,18 @@ func GetUserSets(client *resty.Client, apiKey string, authToken string) *SetsRes
 		fmt.Println("Sets Found: ", resp)
 	}
 	return setsResponse
+}
+
+func DeleteUserSet(client *resty.Client, apiKey string, authToken string, setNumber string) {
+	url := GetURL(fmt.Sprintf("/users/%s/sets/%s/", authToken, setNumber))
+	resp, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
+		Delete(url)
+
+	if resp.StatusCode() == 204 {
+		fmt.Println("Deleted set: 10276-1")
+	}
 }
 
 type SetsResponse struct {
