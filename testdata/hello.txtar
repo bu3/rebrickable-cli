@@ -1,16 +1,16 @@
 env
 
-exec hello user sets get
+exec cli user sets get
 stdout '"count": 0'
 
-exec hello user sets set --set_num 10276-1
+exec cli user sets set --set_num 10276-1
 stdout 'Sets saved'
 
-exec hello user sets get
+exec cli user sets get
 stdout '"count": 1'
 
-exec hello user sets delete --set_num 10276-1
+exec cli user sets delete --set_num 10276-1
 stdout 'Deleted set'
 
-exec hello user sets get
+exec cli user sets get
 stdout '"count": 0'
