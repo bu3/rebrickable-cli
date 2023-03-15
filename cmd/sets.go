@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/bu3/rebrickable-cli/cmd/api"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
@@ -87,7 +89,11 @@ var getSetsCmd = &cobra.Command{
 		client := resty.New()
 		authToken := cmd.Context().Value(AuthToken).(string)
 		apiKey := cmd.Context().Value(ApiKey).(string)
-		api.GetUserSets(client, apiKey, authToken)
+		//TODO: Add error handling
+		//TODO: Move Json output to a dedicated class/function/whatever
+		setsResponse, _ := api.GetUserSets(client, apiKey, authToken)
+		output, _ := json.MarshalIndent(setsResponse, "", "\t")
+		fmt.Println(string(output))
 		return nil
 	},
 }

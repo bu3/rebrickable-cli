@@ -24,7 +24,7 @@ func StoreUserSetList(client *resty.Client, apiKey string, authToken string, nam
 		Post(url)
 
 	if resp.StatusCode() == 201 {
-		fmt.Println("Sets saved: ", resp)
+		fmt.Println("SetList saved: ", resp)
 	}
 }
 
@@ -68,19 +68,20 @@ func StoreUserSet(client *resty.Client, apiKey string, authToken string, setNumb
 	}
 }
 
-func GetUserSets(client *resty.Client, apiKey string, authToken string) *SetsResponse {
+func GetUserSets(client *resty.Client, apiKey string, authToken string) (*SetsResponse, error) {
 	setsResponse := &SetsResponse{}
 	url := GetURL(fmt.Sprintf("/users/%s/sets", authToken))
-	resp, _ := client.R().
+	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
 		SetResult(setsResponse).
 		Get(url)
 
-	if resp.StatusCode() == 200 {
-		fmt.Println("Sets Found: ", resp)
+	if err != nil || resp.StatusCode() != 200 {
+		fmt.Println(fmt.Sprintf("Something went wrong: Status code: [%d] - Error: %v", resp.StatusCode(), err))
+		return nil, err
 	}
-	return setsResponse
+	return setsResponse, nil
 }
 
 func DeleteUserSet(client *resty.Client, apiKey string, authToken string, setNumber string) {
@@ -96,6 +97,6 @@ func DeleteUserSet(client *resty.Client, apiKey string, authToken string, setNum
 }
 
 type SetsResponse struct {
-	count   int `json:"count"`
-	results []map[string]string
+	Count   int              `json:"count"`
+	Results []map[string]any `json:"results"`
 }
