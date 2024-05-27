@@ -92,7 +92,7 @@ func DeleteUserSet(client *resty.Client, apiKey string, authToken string, setNum
 		Delete(url)
 
 	if resp.StatusCode() == 204 {
-		fmt.Println("Deleted set: 10276-1")
+		fmt.Println(fmt.Sprintf("Deleted set: %s", setNumber))
 	}
 }
 
