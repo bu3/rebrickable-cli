@@ -86,6 +86,7 @@ func GetUserSets(client *resty.Client, apiKey string, authToken string) (*SetsRe
 
 func DeleteUserSet(client *resty.Client, apiKey string, authToken string, setNumber string) {
 	url := GetURL(fmt.Sprintf("/users/%s/sets/%s/", authToken, setNumber))
+	fmt.Println(strings.ReplaceAll(fmt.Sprintf("Calling URL: %s", url), authToken, "#token#"))
 	resp, _ := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).

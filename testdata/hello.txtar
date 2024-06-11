@@ -1,16 +1,25 @@
-env
+# Delete default set
+exec cli user sets delete -n 10274-1
+stdout 'Calling URL'
+! stderr .
 
+# Delete default set
+exec cli user sets delete -n 10274
+stdout 'Calling URL'
+! stderr .
+
+# Get sets
 exec cli user sets get
-stdout '"count": 0'
+stdout '"count": 0,'
+! stderr .
 
-exec cli user sets set --set_num 10276-1
+
+# Add default set
+exec cli user sets set -n 10274
 stdout 'Sets saved'
+! stderr .
 
+# Get sets and should contain 1 set only
 exec cli user sets get
-stdout '"count": 1'
-
-exec cli user sets delete --set_num 10276-1
-stdout 'Deleted set'
-
-exec cli user sets get
-stdout '"count": 0'
+stdout '"count": 1,'
+! stderr .

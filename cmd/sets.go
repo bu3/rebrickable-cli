@@ -6,6 +6,7 @@ import (
 	"github.com/bu3/rebrickable-cli/cmd/api"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var setNumber string
@@ -105,7 +106,7 @@ var deleteSetsCmd = &cobra.Command{
 		client := resty.New()
 		authToken := cmd.Context().Value(AuthToken).(string)
 		apiKey := cmd.Context().Value(ApiKey).(string)
-		api.DeleteUserSet(client, apiKey, authToken, setNumber)
+		api.DeleteUserSet(client, apiKey, authToken, adjustedSetNumber())
 		return nil
 	},
 }
@@ -117,7 +118,15 @@ var saveSetsCmd = &cobra.Command{
 		client := resty.New()
 		authToken := cmd.Context().Value(AuthToken).(string)
 		apiKey := cmd.Context().Value(ApiKey).(string)
-		api.StoreUserSet(client, apiKey, authToken, setNumber)
+		api.StoreUserSet(client, apiKey, authToken, adjustedSetNumber())
 		return nil
 	},
+}
+
+func adjustedSetNumber() string {
+	if !strings.HasSuffix(setNumber, "-1") {
+		return setNumber + "-1"
+	}
+
+	return setNumber
 }
