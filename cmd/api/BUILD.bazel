@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "api",
+    srcs = ["api.go"],
+    importpath = "git@github.com:bu3/rebrickable-cli/cmd/api",
+    visibility = ["//visibility:public"],
+    deps = ["@com_github_go_resty_resty_v2//:go_default_library"],
+)
+
+go_test(
+    name = "api_test",
+    srcs = ["api_test.go"],
+    embed = [":api"],
+)

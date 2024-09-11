@@ -1,3 +1,10 @@
 .idea
 rebrickable-cli
 target
+
+# bazel output directories
+bazel-bin
+bazel-go-sfdc-bazel
+bazel-out
+bazel-testlogs
+bazel-rebrickable-cli
