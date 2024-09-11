@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/bu3/rebrickable-cli/cmd/api"
+	"github.com/bu3/rebrickable-cli/cli/cmd/api"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"

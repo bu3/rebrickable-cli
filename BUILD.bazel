@@ -1,30 +1,14 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
-# gazelle:prefix git@github.com:bu3/rebrickable-cli
+# gazelle:prefix github.com/bu3/rebrickable-cli
 gazelle(name = "gazelle")
 
-go_library(
-    name = "rebrickable-cli_lib",
-    srcs = ["main.go"],
-    importpath = "git@github.com:bu3/rebrickable-cli",
-    visibility = ["//visibility:private"],
-    deps = ["@com_github_bu3_rebrickable_cli//cmd:go_default_library"],
-)
-
-go_binary(
-    name = "rebrickable-cli",
-    embed = [":rebrickable-cli_lib"],
-    visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "rebrickable-cli_test",
-    srcs = ["main_test.go"],
-    data = glob(["testdata/**"]),
-    embed = [":rebrickable-cli_lib"],
-    deps = [
-        "@com_github_bu3_rebrickable_cli//cmd:go_default_library",
-        "@com_github_rogpeppe_go_internal//testscript:go_default_library",
+gazelle(
+    name = "gazelle-update-repos",
+    args = [
+        "-from_file=go.mod",
+        "-to_macro=deps.bzl%go_dependencies",
+        "-prune",
     ],
+    command = "update-repos",
 )

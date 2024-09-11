@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bu3/rebrickable-cli/cmd"
+	"github.com/bu3/rebrickable-cli/cli/cmd"
 	"github.com/rogpeppe/go-internal/testscript"
 	"os"
 	"testing"
