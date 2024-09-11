@@ -1,6 +1,5 @@
 .idea
-rebrickable-cli
-target
+.ijwb/.bazelproject
 
 # bazel output directories
 bazel-bin
