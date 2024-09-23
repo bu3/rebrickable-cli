@@ -12,3 +12,9 @@ gazelle(
     ],
     command = "update-repos",
 )
+
+filegroup(
+    name = "test_data",
+    srcs = glob(["testdata/**"]),
+    visibility = ["//visibility:public"],
+)

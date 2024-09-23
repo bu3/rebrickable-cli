@@ -17,6 +17,9 @@ go_binary(
 go_test(
     name = "cli_test",
     srcs = ["main_test.go"],
+    data = [
+        "//:test_data",
+    ],
     embed = [":cli_lib"],
     deps = [
         "//cli/cmd",

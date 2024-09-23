@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 
 func TestCli(t *testing.T) {
 	testscript.Run(t, testscript.Params{
-		Dir:   "./testdata", //TODO pass data with bazel
+		Dir:   "../testdata", //TODO pass data with bazel
 		Setup: setupTestEnv,
 	})
 }
