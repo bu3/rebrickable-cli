@@ -1,3 +1,9 @@
 .idea
-rebrickable-cli
-target
+.ijwb/.bazelproject
+
+# bazel output directories
+bazel-bin
+bazel-go-sfdc-bazel
+bazel-out
+bazel-testlogs
+bazel-rebrickable-cli
