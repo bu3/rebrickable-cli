@@ -1,5 +1,5 @@
 .idea
-.ijwb/.bazelproject
+.ijwb
 
 # bazel output directories
 bazel-bin
