@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/bu3/rebrickable-cli/cli/cmd/api"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
-	"os"
 )
 
 func init() {
@@ -57,9 +58,13 @@ func login(client *resty.Client) (*authToken, error) {
 		SetResult(authToken).
 		Post(api.GetURL("/users/_token/"))
 
-	if resp.StatusCode() != 200 || err != nil {
-		fmt.Println("Login was not successful")
+	if err != nil {
+		return nil, fmt.Errorf("login request failed: %w", err)
 	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("login failed with status %d", resp.StatusCode())
+	}
+
 	return authToken, nil
 }
 
