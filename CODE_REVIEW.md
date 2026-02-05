@@ -1,27 +1,22 @@
 # Code Review Analysis
 
+**Last Updated:** 2026-02-05
+
 ## Overview
 
 This is a well-structured Go CLI for the Rebrickable LEGO API. The architecture follows good separation of concerns with distinct `cmd` and `api` packages. However, there are several areas that need improvement.
+
+**Progress:** 1 issue fixed, 1 partially fixed, 6 remaining.
 
 ---
 
 ## Critical Issues
 
-### 1. Login Function Returns Success on Failure
+### 1. ~~Login Function Returns Success on Failure~~ ✅ FIXED
 
-**Location:** `cli/cmd/user.go:60-63`
+**Location:** `cli/cmd/user.go:61-66`
 
-```go
-if resp.StatusCode() != 200 || err != nil {
-    fmt.Println("Login was not successful")
-}
-return authToken, nil  // Always returns nil error!
-```
-
-**Problem:** The function prints an error message but returns `nil` error, allowing execution to continue with invalid credentials.
-
-**Fix:** Return the error so the caller can handle it:
+**Status:** This issue has been resolved. The login function now properly returns errors:
 
 ```go
 if err != nil {
@@ -32,18 +27,21 @@ if resp.StatusCode() != 200 {
 }
 ```
 
-### 2. Silent Error Discarding Throughout API Package
+### 2. Silent Error Discarding Throughout API Package (Partially Fixed)
 
-**Locations:**
+**Locations still affected:**
 - `cli/cmd/api/api.go:20` - `StoreUserSetList`
 - `cli/cmd/api/api.go:34` - `GetUserSetLists`
 - `cli/cmd/api/api.go:48` - `DeleteUserSetList`
 - `cli/cmd/api/api.go:60` - `StoreUserSet`
 - `cli/cmd/api/api.go:90` - `DeleteUserSet`
 
-**Problem:** Network failures, auth errors, and API issues are silently swallowed. Users won't know why operations fail.
+**Fixed:**
+- ✅ `cli/cmd/api/api.go:71-85` - `GetUserSets` now returns errors properly
 
-**Fix:** All API functions should return `error` and handle it in callers.
+**Problem:** Network failures, auth errors, and API issues are silently swallowed in the remaining functions. Users won't know why operations fail.
+
+**Fix:** Remaining API functions should return `error` and handle it in callers.
 
 ### 3. Silent Error Discarding in Commands
 
@@ -112,7 +110,7 @@ if !ok || authToken == "" {
 
 ### 6. Context Keys Should Be Typed
 
-**Location:** `cli/cmd/user.go:16-19`
+**Location:** `cli/cmd/user.go:17-20`
 
 ```go
 const (
@@ -217,16 +215,16 @@ Commands like `saveSetsCmd` don't validate that required flags are provided befo
 
 ## Summary Table
 
-| Priority | Issue | Location |
-|----------|-------|----------|
-| **Critical** | Login returns nil on failure | `user.go:60-63` |
-| **Critical** | Errors silently discarded | Throughout `api.go` |
-| **High** | Unsafe type assertions | `sets.go` (8 places) |
-| **High** | Weak type safety | `api.go:100-103` |
-| **Medium** | Code duplication | HTTP client/headers |
-| **Medium** | Untyped context keys | `user.go:16-19` |
-| **Low** | Global flag variables | `sets.go:12-13` |
-| **Low** | Missing documentation | `adjustedSetNumber()` |
+| Priority | Issue | Location | Status |
+|----------|-------|----------|--------|
+| ~~**Critical**~~ | ~~Login returns nil on failure~~ | ~~`user.go:60-63`~~ | ✅ Fixed |
+| **Critical** | Errors silently discarded | 5 functions in `api.go` | ⚠️ Partial (`GetUserSets` fixed) |
+| **High** | Unsafe type assertions | `sets.go` (8 places) | ❌ Open |
+| **High** | Weak type safety | `api.go:100-103` | ❌ Open |
+| **Medium** | Code duplication | HTTP client/headers | ❌ Open |
+| **Medium** | Untyped context keys | `user.go:17-20` | ❌ Open |
+| **Low** | Global flag variables | `sets.go:12-13` | ❌ Open |
+| **Low** | Missing documentation | `adjustedSetNumber()` | ❌ Open |
 
 ---
 
@@ -238,3 +236,13 @@ Commands like `saveSetsCmd` don't validate that required flags are provided befo
 - Bazel build setup with proper dependency management
 - Integration tests using testscript framework
 - Token masking in debug output (`api.go:89`)
+
+---
+
+## Maintenance
+
+To refresh this document after making code changes:
+
+```
+check CODE_REVIEW.md, review the code and update the doc
+```
