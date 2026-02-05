@@ -6,7 +6,7 @@
 
 This is a well-structured Go CLI for the Rebrickable LEGO API. The architecture follows good separation of concerns with distinct `cmd` and `api` packages. However, there are several areas that need improvement.
 
-**Progress:** 1 issue fixed, 1 partially fixed, 6 remaining.
+**Progress:** 2 issues fixed, 1 partially fixed, 5 remaining.
 
 ---
 
@@ -58,33 +58,36 @@ output, _ := json.MarshalIndent(setsResponse, "", "\t")
 
 ## Design Issues
 
-### 4. Weak Type Safety for Results
+### 4. ~~Weak Type Safety for Results~~ ✅ FIXED
 
-**Location:** `cli/cmd/api/api.go:100-103`
+**Location:** `cli/cmd/api/api.go:100-123`
 
-```go
-type SetsResponse struct {
-    Count   int              `json:"count"`
-    Results []map[string]any `json:"results"`
-}
-```
-
-**Problem:** Using `map[string]any` loses type safety and makes it hard to work with the data.
-
-**Fix:** Define proper structs for the API response:
+**Status:** This issue has been resolved. Proper typed structs now replace the untyped `map[string]any`:
 
 ```go
 type Set struct {
-    SetNum   string `json:"set_num"`
-    Name     string `json:"name"`
-    Year     int    `json:"year"`
-    NumParts int    `json:"num_parts"`
-    // ... other fields
+    SetNum         string `json:"set_num"`
+    Name           string `json:"name"`
+    Year           int    `json:"year"`
+    ThemeID        int    `json:"theme_id"`
+    NumParts       int    `json:"num_parts"`
+    SetImgURL      string `json:"set_img_url"`
+    SetURL         string `json:"set_url"`
+    LastModifiedDt string `json:"last_modified_dt"`
+}
+
+type UserSet struct {
+    ListID        int  `json:"list_id"`
+    Quantity      int  `json:"quantity"`
+    IncludeSpares bool `json:"include_spares"`
+    Set           Set  `json:"set"`
 }
 
 type SetsResponse struct {
-    Count   int   `json:"count"`
-    Results []Set `json:"results"`
+    Count    int       `json:"count"`
+    Next     string    `json:"next"`
+    Previous string    `json:"previous"`
+    Results  []UserSet `json:"results"`
 }
 ```
 
@@ -220,7 +223,7 @@ Commands like `saveSetsCmd` don't validate that required flags are provided befo
 | ~~**Critical**~~ | ~~Login returns nil on failure~~ | ~~`user.go:60-63`~~ | ✅ Fixed |
 | **Critical** | Errors silently discarded | 5 functions in `api.go` | ⚠️ Partial (`GetUserSets` fixed) |
 | **High** | Unsafe type assertions | `sets.go` (8 places) | ❌ Open |
-| **High** | Weak type safety | `api.go:100-103` | ❌ Open |
+| ~~**High**~~ | ~~Weak type safety~~ | ~~`api.go:100-123`~~ | ✅ Fixed |
 | **Medium** | Code duplication | HTTP client/headers | ❌ Open |
 | **Medium** | Untyped context keys | `user.go:17-20` | ❌ Open |
 | **Low** | Global flag variables | `sets.go:12-13` | ❌ Open |
