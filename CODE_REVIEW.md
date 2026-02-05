@@ -6,7 +6,7 @@
 
 This is a well-structured Go CLI for the Rebrickable LEGO API. The architecture follows good separation of concerns with distinct `cmd` and `api` packages. However, there are several areas that need improvement.
 
-**Progress:** 2 issues fixed, 1 partially fixed, 5 remaining.
+**Progress:** 7 issues fixed, 3 remaining.
 
 ---
 
@@ -27,32 +27,13 @@ if resp.StatusCode() != 200 {
 }
 ```
 
-### 2. Silent Error Discarding Throughout API Package (Partially Fixed)
+### 2. ~~Silent Error Discarding Throughout API Package~~ ✅ FIXED
 
-**Locations still affected:**
-- `cli/cmd/api/api.go:20` - `StoreUserSetList`
-- `cli/cmd/api/api.go:34` - `GetUserSetLists`
-- `cli/cmd/api/api.go:48` - `DeleteUserSetList`
-- `cli/cmd/api/api.go:60` - `StoreUserSet`
-- `cli/cmd/api/api.go:90` - `DeleteUserSet`
+**Status:** Resolved during API client refactoring. All API methods now return `error` and callers handle them properly.
 
-**Fixed:**
-- ✅ `cli/cmd/api/api.go:71-85` - `GetUserSets` now returns errors properly
+### 3. ~~Silent Error Discarding in Commands~~ ✅ FIXED
 
-**Problem:** Network failures, auth errors, and API issues are silently swallowed in the remaining functions. Users won't know why operations fail.
-
-**Fix:** Remaining API functions should return `error` and handle it in callers.
-
-### 3. Silent Error Discarding in Commands
-
-**Location:** `cli/cmd/sets.go:95-96`
-
-```go
-setsResponse, _ := api.GetUserSets(client, apiKey, authToken)
-output, _ := json.MarshalIndent(setsResponse, "", "\t")
-```
-
-**Problem:** Errors are explicitly ignored with `_`.
+**Status:** Resolved. Command handlers now check and return errors from API calls and JSON marshaling.
 
 ---
 
@@ -139,28 +120,21 @@ const (
 
 ## Code Duplication
 
-### 7. HTTP Client Created Multiple Times
+### 7. ~~HTTP Client Created Multiple Times~~ ✅ FIXED
 
-A new `resty.New()` client is created in every command handler. Consider injecting a shared client or creating it once in `PersistentPreRunE`.
+**Status:** Resolved. The `api.Client` struct now encapsulates the HTTP client, created once via `api.NewClient()`. Command handlers use `newAPIClient(cmd)` helper.
 
-### 8. Repeated Header Setup
+### 8. ~~Repeated Header Setup~~ ✅ FIXED
 
-**Location:** `cli/cmd/api/api.go`
-
-Every API function manually sets the same headers:
+**Status:** Resolved. Headers are now configured once in `NewClient()`:
 
 ```go
-SetHeader("Content-Type", "application/json").
-SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
-```
-
-**Fix:** Create a configured client once:
-
-```go
-func NewAuthenticatedClient(apiKey string) *resty.Client {
-    return resty.New().
+func NewClient(apiKey, authToken string) *Client {
+    http := resty.New().
+        SetBaseURL(apiBaseURI).
         SetHeader("Content-Type", "application/json").
         SetHeader("Authorization", fmt.Sprintf("key %s", apiKey))
+    return &Client{http: http, authToken: authToken}
 }
 ```
 
@@ -168,21 +142,9 @@ func NewAuthenticatedClient(apiKey string) *resty.Client {
 
 ## Minor Issues
 
-### 9. Unnecessary `fmt.Sprintf`
+### 9. ~~Unnecessary `fmt.Sprintf`~~ ✅ FIXED
 
-**Locations:** `cli/cmd/api/api.go:15, 54, 96`
-
-```go
-return fmt.Sprintf(apiBaseURI + path)  // Sprintf not needed
-fmt.Println(fmt.Sprintf("Deleted set: %s", id))  // Redundant
-```
-
-**Fix:**
-
-```go
-return apiBaseURI + path
-fmt.Printf("Deleted set: %s\n", id)
-```
+**Status:** Resolved during API client refactoring. Now uses direct concatenation and `fmt.Printf`.
 
 ### 10. Global Mutable State for Flags
 
@@ -221,13 +183,13 @@ Commands like `saveSetsCmd` don't validate that required flags are provided befo
 | Priority | Issue | Location | Status |
 |----------|-------|----------|--------|
 | ~~**Critical**~~ | ~~Login returns nil on failure~~ | ~~`user.go:60-63`~~ | ✅ Fixed |
-| **Critical** | Errors silently discarded | 5 functions in `api.go` | ⚠️ Partial (`GetUserSets` fixed) |
+| ~~**Critical**~~ | ~~Errors silently discarded~~ | ~~`api.go`~~ | ✅ Fixed |
 | **High** | Unsafe type assertions | `sets.go` (8 places) | ❌ Open |
 | ~~**High**~~ | ~~Weak type safety~~ | ~~`api.go:100-123`~~ | ✅ Fixed |
-| **Medium** | Code duplication | HTTP client/headers | ❌ Open |
+| ~~**Medium**~~ | ~~Code duplication~~ | ~~HTTP client/headers~~ | ✅ Fixed |
 | **Medium** | Untyped context keys | `user.go:17-20` | ❌ Open |
 | **Low** | Global flag variables | `sets.go:12-13` | ❌ Open |
-| **Low** | Missing documentation | `adjustedSetNumber()` | ❌ Open |
+| ~~**Low**~~ | ~~Unnecessary fmt.Sprintf~~ | ~~`api.go`~~ | ✅ Fixed |
 
 ---
 

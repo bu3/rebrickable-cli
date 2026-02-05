@@ -1,9 +1,9 @@
-# Delete default set
+# Delete default set (cleanup - may not exist)
 exec cli user sets delete -n 10274-1
 stdout 'Calling URL'
 ! stderr .
 
-# Delete default set
+# Delete default set (cleanup - may not exist)
 exec cli user sets delete -n 10274
 stdout 'Calling URL'
 ! stderr .
@@ -16,7 +16,7 @@ stdout '"count": 0,'
 
 # Add default set
 exec cli user sets set -n 10274
-stdout 'Sets saved'
+stdout 'Set saved'
 ! stderr .
 
 # Get sets and should contain 1 set only
