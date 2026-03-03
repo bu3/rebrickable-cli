@@ -10,3 +10,4 @@ bazel-go-sfdc-bazel
 bazel-out
 bazel-testlogs
 bazel-rebrickable-cli
+bin

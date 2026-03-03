@@ -1,0 +1,3 @@
+test --test_env=REBRICKABLE_USERNAME
+test --test_env=REBRICKABLE_PASSWORD
+test --test_env=REBRICKABLE_API_KEY
