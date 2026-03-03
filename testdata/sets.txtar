@@ -1,0 +1,29 @@
+# Cleanup (may not exist)
+exec cli user sets delete -n 10696
+stdout 'Calling URL'
+! stderr .
+
+# Add set
+exec cli user sets set -n 10696
+stdout 'Set saved'
+! stderr .
+
+# Get specific set
+exec cli user sets getOne -n 10696
+stdout '"set_num": "10696-1"'
+! stderr .
+
+# Replace (update quantity)
+exec cli user sets replace -n 10696 -q 2
+stdout 'Updated set: 10696-1'
+! stderr .
+
+# Verify updated quantity
+exec cli user sets getOne -n 10696
+stdout '"quantity": 2'
+! stderr .
+
+# Cleanup
+exec cli user sets delete -n 10696
+stdout 'Deleted set: 10696-1'
+! stderr .

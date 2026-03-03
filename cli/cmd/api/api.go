@@ -22,8 +22,12 @@ type Client struct {
 }
 
 func NewClient(apiKey, authToken string) *Client {
+	return newClientWithBaseURL(apiKey, authToken, apiBaseURI)
+}
+
+func newClientWithBaseURL(apiKey, authToken, baseURL string) *Client {
 	http := resty.New().
-		SetBaseURL(apiBaseURI).
+		SetBaseURL(baseURL).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey))
 
@@ -49,8 +53,8 @@ func (c *Client) StoreUserSetList(name string) error {
 	return nil
 }
 
-func (c *Client) GetUserSetLists() (*SetsResponse, error) {
-	result := &SetsResponse{}
+func (c *Client) GetUserSetLists() (*SetListsResponse, error) {
+	result := &SetListsResponse{}
 	resp, err := c.http.R().
 		SetResult(result).
 		Get(c.userPath("/setlists"))
@@ -112,6 +116,144 @@ func (c *Client) GetUserSets() (*SetsResponse, error) {
 	return result, nil
 }
 
+func (c *Client) GetUserSetList(listID string) (*SetList, error) {
+	result := &SetList{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(c.userPath(fmt.Sprintf("/setlists/%s/", listID)))
+
+	if err != nil {
+		return nil, fmt.Errorf("get set list request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get set list failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
+
+func (c *Client) UpdateUserSetList(listID, name string) error {
+	resp, err := c.http.R().
+		SetBody(map[string]string{"name": name}).
+		Patch(c.userPath(fmt.Sprintf("/setlists/%s/", listID)))
+
+	if err != nil {
+		return fmt.Errorf("update set list request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("update set list failed with status %d", resp.StatusCode())
+	}
+	fmt.Printf("Updated set list: %s\n", listID)
+	return nil
+}
+
+func (c *Client) ReplaceUserSetList(listID, name string) error {
+	resp, err := c.http.R().
+		SetBody(map[string]string{"name": name}).
+		Put(c.userPath(fmt.Sprintf("/setlists/%s/", listID)))
+
+	if err != nil {
+		return fmt.Errorf("replace set list request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("replace set list failed with status %d", resp.StatusCode())
+	}
+	fmt.Printf("Replaced set list: %s\n", listID)
+	return nil
+}
+
+func (c *Client) GetUserSetListSets(listID string) (*SetsResponse, error) {
+	result := &SetsResponse{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(c.userPath(fmt.Sprintf("/setlists/%s/sets/", listID)))
+
+	if err != nil {
+		return nil, fmt.Errorf("get set list sets request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get set list sets failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
+
+func (c *Client) StoreUserSetListSet(listID, setNum string) error {
+	resp, err := c.http.R().
+		SetBody(map[string]string{"set_num": setNum, "quantity": "1"}).
+		Post(c.userPath(fmt.Sprintf("/setlists/%s/sets/", listID)))
+
+	if err != nil {
+		return fmt.Errorf("store set list set request failed: %w", err)
+	}
+	if resp.StatusCode() != 201 {
+		return fmt.Errorf("store set list set failed with status %d", resp.StatusCode())
+	}
+	fmt.Println("Set added to set list")
+	return nil
+}
+
+func (c *Client) GetUserSetListSet(listID, setNum string) (*UserSet, error) {
+	result := &UserSet{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(c.userPath(fmt.Sprintf("/setlists/%s/sets/%s/", listID, setNum)))
+
+	if err != nil {
+		return nil, fmt.Errorf("get set list set request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get set list set failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
+
+func (c *Client) DeleteUserSetListSet(listID, setNum string) error {
+	resp, err := c.http.R().
+		Delete(c.userPath(fmt.Sprintf("/setlists/%s/sets/%s/", listID, setNum)))
+
+	if err != nil {
+		return fmt.Errorf("delete set list set request failed: %w", err)
+	}
+	if resp.StatusCode() == 404 {
+		fmt.Printf("Set %s not found in set list %s\n", setNum, listID)
+		return nil
+	}
+	if resp.StatusCode() != 204 {
+		return fmt.Errorf("delete set list set failed with status %d", resp.StatusCode())
+	}
+	fmt.Printf("Deleted set %s from set list %s\n", setNum, listID)
+	return nil
+}
+
+func (c *Client) GetUserSet(setNum string) (*UserSet, error) {
+	result := &UserSet{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(c.userPath(fmt.Sprintf("/sets/%s/", setNum)))
+
+	if err != nil {
+		return nil, fmt.Errorf("get set request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get set failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
+
+func (c *Client) ReplaceUserSet(setNum string, quantity int) error {
+	resp, err := c.http.R().
+		SetBody(map[string]int{"quantity": quantity}).
+		Put(c.userPath(fmt.Sprintf("/sets/%s/", setNum)))
+
+	if err != nil {
+		return fmt.Errorf("replace set request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 && resp.StatusCode() != 201 {
+		return fmt.Errorf("replace set failed with status %d", resp.StatusCode())
+	}
+	fmt.Printf("Updated set: %s\n", setNum)
+	return nil
+}
+
 func (c *Client) DeleteUserSet(setNumber string) error {
 	path := c.userPath(fmt.Sprintf("/sets/%s/", setNumber))
 	fmt.Println("Calling URL:", strings.ReplaceAll(apiBaseURI+path, c.authToken, "#token#"))
@@ -155,4 +297,18 @@ type SetsResponse struct {
 	Next     string    `json:"next"`
 	Previous string    `json:"previous"`
 	Results  []UserSet `json:"results"`
+}
+
+type SetList struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	NumSets  int    `json:"num_sets"`
+	IsBuild  bool   `json:"is_build_list"`
+}
+
+type SetListsResponse struct {
+	Count    int       `json:"count"`
+	Next     string    `json:"next"`
+	Previous string    `json:"previous"`
+	Results  []SetList `json:"results"`
 }

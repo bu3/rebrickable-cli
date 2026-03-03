@@ -1,6 +1,11 @@
 package api
 
-import "testing"
+import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
 
 func TestGetURL(t *testing.T) {
 	type args struct {
@@ -18,6 +23,452 @@ func TestGetURL(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetURL(tt.args.path); got != tt.want {
 				t.Errorf("GetURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestStoreUserSetList(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"created successfully", 201, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.StoreUserSetList("My List")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StoreUserSetList() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGetUserSetLists(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetListsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{
+			"returns set lists",
+			SetListsResponse{Count: 1, Results: []SetList{{ID: 42, Name: "Technic"}}},
+			200,
+			false,
+		},
+		{"server error", SetListsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			result, err := client.GetUserSetLists()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetUserSetLists() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetUserSetLists() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestDeleteUserSetList(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"deleted successfully", 204, false},
+		{"not found", 404, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.DeleteUserSetList("123")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeleteUserSetList() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestStoreUserSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"created successfully", 201, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.StoreUserSet("42043-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StoreUserSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGetUserSets(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{
+			"returns user sets",
+			SetsResponse{Count: 2, Results: []UserSet{{Quantity: 1}, {Quantity: 3}}},
+			200,
+			false,
+		},
+		{"server error", SetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			result, err := client.GetUserSets()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetUserSets() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetUserSets() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetUserSetList(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetList
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns set list", SetList{ID: 42, Name: "Technic"}, 200, false},
+		{"not found", SetList{}, 404, true},
+		{"server error", SetList{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			result, err := client.GetUserSetList("42")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetUserSetList() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Name != tt.response.Name {
+				t.Errorf("GetUserSetList() name = %v, want %v", result.Name, tt.response.Name)
+			}
+		})
+	}
+}
+
+func TestUpdateUserSetList(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"updated successfully", 200, false},
+		{"not found", 404, true},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.UpdateUserSetList("42", "New Name")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UpdateUserSetList() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestReplaceUserSetList(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"replaced successfully", 200, false},
+		{"not found", 404, true},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.ReplaceUserSetList("42", "New Name")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReplaceUserSetList() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGetUserSetListSets(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{
+			"returns sets in set list",
+			SetsResponse{Count: 1, Results: []UserSet{{Quantity: 1}}},
+			200,
+			false,
+		},
+		{"server error", SetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			result, err := client.GetUserSetListSets("42")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetUserSetListSets() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetUserSetListSets() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestStoreUserSetListSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"created successfully", 201, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.StoreUserSetListSet("42", "10274-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StoreUserSetListSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGetUserSetListSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   UserSet
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns set", UserSet{Quantity: 2}, 200, false},
+		{"not found", UserSet{}, 404, true},
+		{"server error", UserSet{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			result, err := client.GetUserSetListSet("42", "10274-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetUserSetListSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Quantity != tt.response.Quantity {
+				t.Errorf("GetUserSetListSet() quantity = %v, want %v", result.Quantity, tt.response.Quantity)
+			}
+		})
+	}
+}
+
+func TestDeleteUserSetListSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"deleted successfully", 204, false},
+		{"not found", 404, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.DeleteUserSetListSet("42", "10274-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeleteUserSetListSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGetUserSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   UserSet
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns set", UserSet{Quantity: 1, Set: Set{SetNum: "10274-1", Name: "Ghost"}}, 200, false},
+		{"not found", UserSet{}, 404, true},
+		{"server error", UserSet{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			result, err := client.GetUserSet("10274-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetUserSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Set.SetNum != tt.response.Set.SetNum {
+				t.Errorf("GetUserSet() set_num = %v, want %v", result.Set.SetNum, tt.response.Set.SetNum)
+			}
+		})
+	}
+}
+
+func TestReplaceUserSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"replaced successfully", 200, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.ReplaceUserSet("10274-1", 2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReplaceUserSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestDeleteUserSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    bool
+	}{
+		{"deleted successfully", 204, false},
+		{"not found", 404, false},
+		{"server error", 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "token", server.URL)
+			err := client.DeleteUserSet("42043-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeleteUserSet() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
