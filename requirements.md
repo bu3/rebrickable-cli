@@ -1,114 +1,157 @@
 # Rebrickable API — Remaining Endpoints
 
-Endpoints from `openapi.spec.json` not yet implemented. Grouped by resource.
+Derived from `openapi.spec.json`. **15 of 60 operations implemented** (25%).
 
 ---
 
-## Badges
+## LEGO Catalog (not yet implemented)
+
+These are read-only, unauthenticated endpoints (API key only, no user token).
+
+### Colors
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/colors/` |
+| GET | `/api/v3/lego/colors/{id}/` |
+
+### Elements
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/elements/{element_id}/` |
+
+### Minifigs
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/minifigs/` |
+| GET | `/api/v3/lego/minifigs/{set_num}/` |
+| GET | `/api/v3/lego/minifigs/{set_num}/parts/` |
+| GET | `/api/v3/lego/minifigs/{set_num}/sets/` |
+
+### Part Categories
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/part_categories/` |
+| GET | `/api/v3/lego/part_categories/{id}/` |
+
+### Parts
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/parts/` |
+| GET | `/api/v3/lego/parts/{part_num}/` |
+| GET | `/api/v3/lego/parts/{part_num}/colors/` |
+| GET | `/api/v3/lego/parts/{part_num}/colors/{color_id}/` |
+| GET | `/api/v3/lego/parts/{part_num}/colors/{color_id}/sets/` |
+
+### Sets
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/sets/` |
+| GET | `/api/v3/lego/sets/{set_num}/` |
+| GET | `/api/v3/lego/sets/{set_num}/alternates/` |
+| GET | `/api/v3/lego/sets/{set_num}/minifigs/` |
+| GET | `/api/v3/lego/sets/{set_num}/parts/` |
+| GET | `/api/v3/lego/sets/{set_num}/sets/` |
+
+### Themes
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/themes/` |
+| GET | `/api/v3/lego/themes/{id}/` |
+
+---
+
+## User Endpoints (not yet implemented)
+
+All require `Authorization: key {api_key}` header and `{user_token}` in the path.
+Auth token is obtained via `POST /users/_token/` (already implemented in `user.go`).
+
+### Badges
 
 | Method | Path | Notes |
 |--------|------|-------|
-| GET | `/api/v3/users/badges/` | List all badges |
-| GET | `/api/v3/users/badges/{id}/` | Get a specific badge |
+| GET | `/api/v3/users/badges/` | No user token required |
+| GET | `/api/v3/users/badges/{id}/` | No user token required |
 
-No auth token required — uses API key only.
+### Profile
 
----
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/users/{user_token}/profile/` |
 
-## User Profile
-
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/api/v3/users/{user_token}/profile/` | Get user profile details |
-
----
-
-## All Parts
+### All Parts
 
 | Method | Path | Notes |
 |--------|------|-------|
-| GET | `/api/v3/users/{user_token}/allparts/` | Get all parts across all sets and part lists |
+| GET | `/api/v3/users/{user_token}/allparts/` | Aggregates parts across all sets and part lists |
 
----
+### Parts
 
-## Parts
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/users/{user_token}/parts/` |
 
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/api/v3/users/{user_token}/parts/` | Get parts owned by the user |
+### Minifigs
 
----
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/users/{user_token}/minifigs/` |
 
-## Minifigs
-
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/api/v3/users/{user_token}/minifigs/` | Get minifigs owned by the user |
-
----
-
-## Build
+### Build
 
 | Method | Path | Notes |
 |--------|------|-------|
 | GET | `/api/v3/users/{user_token}/build/{set_num}/` | Check if user can build a set from owned parts |
 
----
-
-## Lost Parts
+### Lost Parts
 
 | Method | Path | Notes |
 |--------|------|-------|
-| GET | `/api/v3/users/{user_token}/lost_parts/` | List lost parts |
-| POST | `/api/v3/users/{user_token}/lost_parts/` | Report a lost part. Body: `inv_part_id` (integer) |
-| DELETE | `/api/v3/users/{user_token}/lost_parts/{id}/` | Remove a lost part record |
+| GET | `/api/v3/users/{user_token}/lost_parts/` | |
+| POST | `/api/v3/users/{user_token}/lost_parts/` | Body: `inv_part_id` (integer) |
+| DELETE | `/api/v3/users/{user_token}/lost_parts/{id}/` | |
 
----
-
-## Part Lists
+### Part Lists
 
 | Method | Path | Notes |
 |--------|------|-------|
-| GET | `/api/v3/users/{user_token}/partlists/` | List all part lists |
-| POST | `/api/v3/users/{user_token}/partlists/` | Create a part list. Body: `name` (required) |
-| GET | `/api/v3/users/{user_token}/partlists/{list_id}/` | Get a specific part list |
-| PATCH | `/api/v3/users/{user_token}/partlists/{list_id}/` | Partially update a part list. Body: `name` |
-| PUT | `/api/v3/users/{user_token}/partlists/{list_id}/` | Replace a part list. Body: `name` (required) |
-| DELETE | `/api/v3/users/{user_token}/partlists/{list_id}/` | Delete a part list |
+| GET | `/api/v3/users/{user_token}/partlists/` | |
+| POST | `/api/v3/users/{user_token}/partlists/` | Body: `name` (required) |
+| GET | `/api/v3/users/{user_token}/partlists/{list_id}/` | |
+| PATCH | `/api/v3/users/{user_token}/partlists/{list_id}/` | Body: `name` |
+| PUT | `/api/v3/users/{user_token}/partlists/{list_id}/` | Body: `name` (required) |
+| DELETE | `/api/v3/users/{user_token}/partlists/{list_id}/` | |
+| GET | `/api/v3/users/{user_token}/partlists/{list_id}/parts/` | |
+| POST | `/api/v3/users/{user_token}/partlists/{list_id}/parts/` | Body: `part_num`, `color_id`, `quantity` |
+| GET | `/api/v3/users/{user_token}/partlists/{list_id}/parts/{part_num}/{color_id}/` | |
+| PUT | `/api/v3/users/{user_token}/partlists/{list_id}/parts/{part_num}/{color_id}/` | Body: `quantity` |
+| DELETE | `/api/v3/users/{user_token}/partlists/{list_id}/parts/{part_num}/{color_id}/` | |
 
-### Parts within a Part List
-
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/api/v3/users/{user_token}/partlists/{list_id}/parts/` | List parts in a part list |
-| POST | `/api/v3/users/{user_token}/partlists/{list_id}/parts/` | Add a part. Body: `part_num`, `color_id`, `quantity` |
-| GET | `/api/v3/users/{user_token}/partlists/{list_id}/parts/{part_num}/{color_id}/` | Get a specific part |
-| PUT | `/api/v3/users/{user_token}/partlists/{list_id}/parts/{part_num}/{color_id}/` | Replace a part. Body: `quantity` |
-| DELETE | `/api/v3/users/{user_token}/partlists/{list_id}/parts/{part_num}/{color_id}/` | Remove a part |
-
----
-
-## Sets — Remaining Operations
+### Sets — remaining operations
 
 | Method | Path | Notes |
 |--------|------|-------|
-| POST | `/api/v3/users/{user_token}/sets/sync/` | Sync sets. Replaces all sets in the default list |
+| POST | `/api/v3/users/{user_token}/sets/sync/` | Destructive — replaces the entire default set list |
 
----
-
-## Set Lists — Remaining Operations
+### Set List Sets — remaining operations
 
 | Method | Path | Notes |
 |--------|------|-------|
-| PATCH | `/api/v3/users/{user_token}/setlists/{list_id}/sets/{set_num}/` | Partially update a set in a list. Body: `quantity`, `include_spares` |
-| PUT | `/api/v3/users/{user_token}/setlists/{list_id}/sets/{set_num}/` | Replace a set in a list. Body: `quantity`, `include_spares` |
+| PATCH | `/api/v3/users/{user_token}/setlists/{list_id}/sets/{set_num}/` | Body: `quantity`, `include_spares` |
+| PUT | `/api/v3/users/{user_token}/setlists/{list_id}/sets/{set_num}/` | Body: `quantity`, `include_spares` |
 
 ---
 
 ## Implementation Notes
 
-- All user endpoints require both `Authorization: key {api_key}` header and `{user_token}` in the path, obtained via `POST /users/_token/`.
-- Paginated list responses follow the `{ count, next, previous, results[] }` shape already used by `SetsResponse` and `SetListsResponse`.
-- Part list parts are identified by a composite key `(part_num, color_id)` rather than a single ID.
-- `sets/sync/` is a destructive operation — it replaces the entire default set list.
-- Integration testing of resources with auto-generated IDs (part lists, set lists) is impractical with txtar; cover with unit tests using httptest mocks instead.
+- LEGO catalog endpoints do not require a user token — they can use a simpler client (API key only, no login step).
+- Paginated list responses follow `{ count, next, previous, results[] }` — reuse existing `SetsResponse` / `SetListsResponse` as a pattern.
+- Part list parts use a composite key `(part_num, color_id)` rather than a single ID.
+- `sets/sync/` is destructive — it replaces the entire default set list.
+- Integration testing with txtar is practical only for resources with stable, known identifiers (e.g. set numbers). Resources with auto-generated IDs (part lists, setlists) should be covered by unit tests using `httptest` mocks.
