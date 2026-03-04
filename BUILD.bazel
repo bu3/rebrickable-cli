@@ -1,4 +1,7 @@
+load("@gazelle//:def.bzl", "gazelle")
+
 # gazelle:prefix github.com/bu3/rebrickable-cli
+gazelle(name = "gazelle")
 
 filegroup(
     name = "test_data",

@@ -5,6 +5,7 @@
 .ijwb
 
 # bazel output directories
+.bazel/
 bazel-bin
 bazel-go-sfdc-bazel
 bazel-out
