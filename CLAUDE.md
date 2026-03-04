@@ -20,7 +20,7 @@ Credentials must be in the environment for integration tests (`//cli:cli_test`).
 
 The CLI is a [Cobra](https://github.com/spf13/cobra) application with three layers:
 
-**`cli/cmd/api/api.go`** — pure HTTP client. All Rebrickable API calls live here as methods on `Client`. Uses [resty](https://github.com/go-resty/resty). `NewClient(apiKey, authToken)` is the public constructor; `newClientWithBaseURL(apiKey, authToken, baseURL)` is used in tests to inject a mock server.
+**`cli/cmd/api/`** — pure HTTP client package. Split across three files: `api.go` (types, `Client` struct, constructors), `user.go` (user endpoint methods), `lego.go` (LEGO catalog endpoint methods). Uses [resty](https://github.com/go-resty/resty). `NewClient(apiKey, authToken)` is the public constructor; `newClientWithBaseURL(apiKey, authToken, baseURL)` is used in tests to inject a mock server.
 
 **`cli/cmd/sets.go`** — Cobra command definitions wired to `api.Client` methods. All set and setlist commands live here. `newAPIClient(cmd)` extracts auth from the command context set by the login middleware.
 
@@ -32,7 +32,7 @@ Every `user *` command triggers `PersistentPreRunE` in `user.go`, which reads `R
 
 ### Adding a new API endpoint
 
-1. Add a method to `Client` in `cli/cmd/api/api.go` following the existing pattern.
+1. Add a method to `Client` in `cli/cmd/api/user.go` (user endpoints) or `cli/cmd/api/lego.go` (catalog endpoints) following the existing pattern.
 2. Add a corresponding `*cobra.Command` var in `cli/cmd/sets.go` and register it in the appropriate `*Commands()` init function.
 3. Add unit tests in `cli/cmd/api/api_test.go` using `httptest.NewServer` + `newClientWithBaseURL`.
 4. Add a txtar integration test in `testdata/` only if the operation is idempotent and self-cleaning (i.e. uses stable IDs like set numbers). Resources with auto-generated IDs (setlists, part lists) are not suitable for txtar tests — cover with unit tests only.

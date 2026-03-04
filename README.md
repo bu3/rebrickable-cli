@@ -2,13 +2,21 @@
 
 Client to interact with [Rebrickable API](https://rebrickable.com/api/v3/docs/?key=).
 
-## Machine setup
-Set following Environment variables:
+## Setup
+
+Set the following environment variables:
 
 ```
 export REBRICKABLE_USERNAME=...
-export REBRICKABLE_PASSWORD="..." #using quotes to prevent issue with values
-export REBRICKABLE_API_KEY=....
+export REBRICKABLE_PASSWORD="..."
+export REBRICKABLE_API_KEY=...
+```
+
+Build and test with Bazel:
+
+```bash
+bazel test //...          # run all tests
+bazel build //cli         # build the binary
 ```
 
 ## Supported API
