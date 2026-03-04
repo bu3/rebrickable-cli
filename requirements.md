@@ -1,6 +1,6 @@
 # Rebrickable API — Remaining Endpoints
 
-Derived from `openapi.spec.json`. **15 of 60 operations implemented** (25%).
+Derived from `openapi.spec.json`. **21 of 60 operations implemented** (35%).
 
 ---
 
@@ -47,7 +47,7 @@ These are read-only, unauthenticated endpoints (API key only, no user token).
 | GET | `/api/v3/lego/parts/{part_num}/colors/{color_id}/` |
 | GET | `/api/v3/lego/parts/{part_num}/colors/{color_id}/sets/` |
 
-### Sets
+### Sets ✅ implemented
 
 | Method | Path |
 |--------|------|

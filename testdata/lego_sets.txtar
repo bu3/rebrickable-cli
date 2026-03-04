@@ -1,0 +1,20 @@
+# Get a specific set
+exec cli lego sets get -n 10497
+stdout '"set_num": "10497-1"'
+stdout '"name": "Galaxy Explorer"'
+! stderr .
+
+# Get alternates for the set
+exec cli lego sets alternates -n 10497
+stdout '"count":'
+! stderr .
+
+# Get minifigs in the set
+exec cli lego sets minifigs -n 10497
+stdout '"count":'
+! stderr .
+
+# Get parts in the set
+exec cli lego sets parts -n 10497
+stdout '"count":'
+! stderr .

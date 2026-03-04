@@ -7,6 +7,205 @@ import (
 	"testing"
 )
 
+func TestGetLegoSets(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   LegoSetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns sets", LegoSetsResponse{Count: 1, Results: []Set{{SetNum: "10497-1", Name: "Galaxy Explorer"}}}, 200, false},
+		{"server error", LegoSetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoSets()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoSets() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoSets() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoSet(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   Set
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns set", Set{SetNum: "10497-1", Name: "Galaxy Explorer", Year: 2022}, 200, false},
+		{"not found", Set{}, 404, true},
+		{"server error", Set{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoSet("10497-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoSet() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.SetNum != tt.response.SetNum {
+				t.Errorf("GetLegoSet() set_num = %v, want %v", result.SetNum, tt.response.SetNum)
+			}
+		})
+	}
+}
+
+func TestGetLegoSetAlternates(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   LegoSetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns alternates", LegoSetsResponse{Count: 1, Results: []Set{{SetNum: "moc-1234"}}}, 200, false},
+		{"server error", LegoSetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoSetAlternates("10497-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoSetAlternates() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoSetAlternates() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoSetMinifigs(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetMinifigsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns minifigs", SetMinifigsResponse{Count: 2, Results: []SetMinifig{{SetNum: "fig-001", Name: "Astronaut"}}}, 200, false},
+		{"server error", SetMinifigsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoSetMinifigs("10497-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoSetMinifigs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoSetMinifigs() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoSetParts(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetPartsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns parts", SetPartsResponse{Count: 3, Results: []SetPart{{Quantity: 2, Part: Part{PartNum: "3001"}}}}, 200, false},
+		{"server error", SetPartsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoSetParts("10497-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoSetParts() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoSetParts() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoSetSets(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   LegoSetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns sub-sets", LegoSetsResponse{Count: 1, Results: []Set{{SetNum: "75192-1"}}}, 200, false},
+		{"server error", LegoSetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoSetSets("10497-1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoSetSets() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoSetSets() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
 func TestGetURL(t *testing.T) {
 	type args struct {
 		path string

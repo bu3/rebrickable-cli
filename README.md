@@ -42,3 +42,16 @@ export REBRICKABLE_API_KEY=....
 | `user setListSets getOne` | `-l <list_id>` `-n <set_num>` | GET `/users/{token}/setlists/{list_id}/sets/{set_num}/` |
 | `user setListSets set` | `-l <list_id>` `-n <set_num>` | POST `/users/{token}/setlists/{list_id}/sets/` |
 | `user setListSets delete` | `-l <list_id>` `-n <set_num>` | DELETE `/users/{token}/setlists/{list_id}/sets/{set_num}/` |
+
+### LEGO Catalog Sets (`lego sets`)
+
+Requires only `REBRICKABLE_API_KEY` — no login needed.
+
+| Command | Flag(s) | API |
+|---------|---------|-----|
+| `lego sets list` | | GET `/lego/sets/` |
+| `lego sets get` | `-n <set_num>` | GET `/lego/sets/{set_num}/` |
+| `lego sets alternates` | `-n <set_num>` | GET `/lego/sets/{set_num}/alternates/` |
+| `lego sets minifigs` | `-n <set_num>` | GET `/lego/sets/{set_num}/minifigs/` |
+| `lego sets parts` | `-n <set_num>` | GET `/lego/sets/{set_num}/parts/` |
+| `lego sets sets` | `-n <set_num>` | GET `/lego/sets/{set_num}/sets/` |
