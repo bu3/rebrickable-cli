@@ -3,18 +3,11 @@ package api
 import "fmt"
 
 func (c *Client) GetLegoSets() (*LegoSetsResponse, error) {
-	result := &LegoSetsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get("/lego/sets/")
-
+	count, results, err := fetchAllPages[Set](c.http, "/lego/sets/")
 	if err != nil {
-		return nil, fmt.Errorf("get lego sets request failed: %w", err)
+		return nil, fmt.Errorf("get lego sets: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get lego sets failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &LegoSetsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) GetLegoSet(setNum string) (*Set, error) {
@@ -33,61 +26,33 @@ func (c *Client) GetLegoSet(setNum string) (*Set, error) {
 }
 
 func (c *Client) GetLegoSetAlternates(setNum string) (*LegoSetsResponse, error) {
-	result := &LegoSetsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(fmt.Sprintf("/lego/sets/%s/alternates/", setNum))
-
+	count, results, err := fetchAllPages[Set](c.http, fmt.Sprintf("/lego/sets/%s/alternates/", setNum))
 	if err != nil {
-		return nil, fmt.Errorf("get lego set alternates request failed: %w", err)
+		return nil, fmt.Errorf("get lego set alternates: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get lego set alternates failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &LegoSetsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) GetLegoSetMinifigs(setNum string) (*SetMinifigsResponse, error) {
-	result := &SetMinifigsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(fmt.Sprintf("/lego/sets/%s/minifigs/", setNum))
-
+	count, results, err := fetchAllPages[SetMinifig](c.http, fmt.Sprintf("/lego/sets/%s/minifigs/", setNum))
 	if err != nil {
-		return nil, fmt.Errorf("get lego set minifigs request failed: %w", err)
+		return nil, fmt.Errorf("get lego set minifigs: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get lego set minifigs failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &SetMinifigsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) GetLegoSetParts(setNum string) (*SetPartsResponse, error) {
-	result := &SetPartsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(fmt.Sprintf("/lego/sets/%s/parts/", setNum))
-
+	count, results, err := fetchAllPages[SetPart](c.http, fmt.Sprintf("/lego/sets/%s/parts/", setNum))
 	if err != nil {
-		return nil, fmt.Errorf("get lego set parts request failed: %w", err)
+		return nil, fmt.Errorf("get lego set parts: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get lego set parts failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &SetPartsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) GetLegoSetSets(setNum string) (*LegoSetsResponse, error) {
-	result := &LegoSetsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(fmt.Sprintf("/lego/sets/%s/sets/", setNum))
-
+	count, results, err := fetchAllPages[Set](c.http, fmt.Sprintf("/lego/sets/%s/sets/", setNum))
 	if err != nil {
-		return nil, fmt.Errorf("get lego set sets request failed: %w", err)
+		return nil, fmt.Errorf("get lego set sets: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get lego set sets failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &LegoSetsResponse{Count: count, Results: results}, nil
 }

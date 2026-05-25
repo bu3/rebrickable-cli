@@ -1,9 +1,6 @@
 package api
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 func (c *Client) StoreUserSetList(name string) error {
 	resp, err := c.http.R().
@@ -21,18 +18,11 @@ func (c *Client) StoreUserSetList(name string) error {
 }
 
 func (c *Client) GetUserSetLists() (*SetListsResponse, error) {
-	result := &SetListsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(c.userPath("/setlists"))
-
+	count, results, err := fetchAllPages[SetList](c.http, c.userPath("/setlists"))
 	if err != nil {
-		return nil, fmt.Errorf("get set lists request failed: %w", err)
+		return nil, fmt.Errorf("get user set lists: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get set lists failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &SetListsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) GetUserSetList(listID string) (*SetList, error) {
@@ -99,18 +89,11 @@ func (c *Client) DeleteUserSetList(id string) error {
 }
 
 func (c *Client) GetUserSetListSets(listID string) (*SetsResponse, error) {
-	result := &SetsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(c.userPath(fmt.Sprintf("/setlists/%s/sets/", listID)))
-
+	count, results, err := fetchAllPages[UserSet](c.http, c.userPath(fmt.Sprintf("/setlists/%s/sets/", listID)))
 	if err != nil {
-		return nil, fmt.Errorf("get set list sets request failed: %w", err)
+		return nil, fmt.Errorf("get user set list sets: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get set list sets failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &SetsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) StoreUserSetListSet(listID, setNum string) error {
@@ -177,18 +160,11 @@ func (c *Client) StoreUserSet(setNumber string) error {
 }
 
 func (c *Client) GetUserSets() (*SetsResponse, error) {
-	result := &SetsResponse{}
-	resp, err := c.http.R().
-		SetResult(result).
-		Get(c.userPath("/sets"))
-
+	count, results, err := fetchAllPages[UserSet](c.http, c.userPath("/sets"))
 	if err != nil {
-		return nil, fmt.Errorf("get sets request failed: %w", err)
+		return nil, fmt.Errorf("get user sets: %w", err)
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("get sets failed with status %d", resp.StatusCode())
-	}
-	return result, nil
+	return &SetsResponse{Count: count, Results: results}, nil
 }
 
 func (c *Client) GetUserSet(setNum string) (*UserSet, error) {
@@ -223,8 +199,6 @@ func (c *Client) ReplaceUserSet(setNum string, quantity int) error {
 
 func (c *Client) DeleteUserSet(setNumber string) error {
 	path := c.userPath(fmt.Sprintf("/sets/%s/", setNumber))
-	fmt.Println("Calling URL:", strings.ReplaceAll(apiBaseURI+path, c.authToken, "#token#"))
-
 	resp, err := c.http.R().Delete(path)
 
 	if err != nil {

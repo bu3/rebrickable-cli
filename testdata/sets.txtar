@@ -1,6 +1,6 @@
 # Cleanup (may not exist)
 exec cli user sets delete -n 10696
-stdout 'Calling URL'
+stdout '(Deleted set|not found)'
 ! stderr .
 
 # Add set

@@ -7,6 +7,40 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+func fetchAllPages[T any](httpClient *resty.Client, firstURL string) (int, []T, error) {
+	type page struct {
+		Count   int    `json:"count"`
+		Next    string `json:"next"`
+		Results []T    `json:"results"`
+	}
+
+	var all []T
+	totalCount := 0
+	isFirst := true
+	url := firstURL
+
+	for {
+		p := &page{}
+		resp, err := httpClient.R().SetResult(p).Get(url)
+		if err != nil {
+			return 0, nil, fmt.Errorf("request failed: %w", err)
+		}
+		if resp.StatusCode() != 200 {
+			return 0, nil, fmt.Errorf("unexpected status %d", resp.StatusCode())
+		}
+		if isFirst {
+			totalCount = p.Count
+			isFirst = false
+		}
+		all = append(all, p.Results...)
+		if p.Next == "" {
+			break
+		}
+		url = p.Next
+	}
+	return totalCount, all, nil
+}
+
 const apiBaseURI = "https://rebrickable.com/api/v3"
 
 func GetURL(path string) string {

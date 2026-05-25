@@ -672,3 +672,99 @@ func TestDeleteUserSet(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLegoSetsPagination(t *testing.T) {
+	page1Set := Set{SetNum: "10497-1", Name: "Galaxy Explorer"}
+	page2Set := Set{SetNum: "75192-1", Name: "Millennium Falcon"}
+
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Query().Get("page") == "2" {
+			_ = json.NewEncoder(w).Encode(LegoSetsResponse{Count: 2, Results: []Set{page2Set}})
+		} else {
+			_ = json.NewEncoder(w).Encode(LegoSetsResponse{Count: 2, Next: serverURL + "/?page=2", Results: []Set{page1Set}})
+		}
+	}))
+	defer server.Close()
+	serverURL = server.URL
+
+	client := newClientWithBaseURL("key", "", server.URL)
+	result, err := client.GetLegoSets()
+
+	if err != nil {
+		t.Fatalf("GetLegoSets() unexpected error: %v", err)
+	}
+	if result.Count != 2 {
+		t.Errorf("GetLegoSets() count = %d, want 2", result.Count)
+	}
+	if len(result.Results) != 2 {
+		t.Errorf("GetLegoSets() len(results) = %d, want 2", len(result.Results))
+	}
+	if result.Results[0].SetNum != page1Set.SetNum {
+		t.Errorf("GetLegoSets() results[0].SetNum = %q, want %q", result.Results[0].SetNum, page1Set.SetNum)
+	}
+	if result.Results[1].SetNum != page2Set.SetNum {
+		t.Errorf("GetLegoSets() results[1].SetNum = %q, want %q", result.Results[1].SetNum, page2Set.SetNum)
+	}
+}
+
+func TestGetLegoSetsPaginationErrorOnSecondPage(t *testing.T) {
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Query().Get("page") == "2" {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			_ = json.NewEncoder(w).Encode(LegoSetsResponse{Count: 2, Next: serverURL + "/?page=2", Results: []Set{{SetNum: "10497-1"}}})
+		}
+	}))
+	defer server.Close()
+	serverURL = server.URL
+
+	client := newClientWithBaseURL("key", "", server.URL)
+	_, err := client.GetLegoSets()
+
+	if err == nil {
+		t.Error("GetLegoSets() expected error on second page, got nil")
+	}
+}
+
+func TestGetUserSetsPagination(t *testing.T) {
+	page1Set := UserSet{Quantity: 1, Set: Set{SetNum: "10497-1"}}
+	page2Set := UserSet{Quantity: 2, Set: Set{SetNum: "75192-1"}}
+
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Query().Get("page") == "2" {
+			_ = json.NewEncoder(w).Encode(SetsResponse{Count: 2, Results: []UserSet{page2Set}})
+		} else {
+			_ = json.NewEncoder(w).Encode(SetsResponse{Count: 2, Next: serverURL + "/?page=2", Results: []UserSet{page1Set}})
+		}
+	}))
+	defer server.Close()
+	serverURL = server.URL
+
+	client := newClientWithBaseURL("key", "token", server.URL)
+	result, err := client.GetUserSets()
+
+	if err != nil {
+		t.Fatalf("GetUserSets() unexpected error: %v", err)
+	}
+	if result.Count != 2 {
+		t.Errorf("GetUserSets() count = %d, want 2", result.Count)
+	}
+	if len(result.Results) != 2 {
+		t.Errorf("GetUserSets() len(results) = %d, want 2", len(result.Results))
+	}
+	if result.Results[0].Set.SetNum != page1Set.Set.SetNum {
+		t.Errorf("GetUserSets() results[0].SetNum = %q, want %q", result.Results[0].Set.SetNum, page1Set.Set.SetNum)
+	}
+	if result.Results[1].Set.SetNum != page2Set.Set.SetNum {
+		t.Errorf("GetUserSets() results[1].SetNum = %q, want %q", result.Results[1].Set.SetNum, page2Set.Set.SetNum)
+	}
+}

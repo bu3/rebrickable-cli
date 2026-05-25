@@ -1,14 +1,14 @@
 # Cleanup (may not exist)
 exec cli user sets delete -n 10274-1
-stdout 'Calling URL'
+stdout '(Deleted set|not found)'
 ! stderr .
 
 exec cli user sets delete -n 10274
-stdout 'Calling URL'
+stdout '(Deleted set|not found)'
 ! stderr .
 
 exec cli user sets delete -n 10497
-stdout 'Calling URL'
+stdout '(Deleted set|not found)'
 ! stderr .
 
 # Add default set
