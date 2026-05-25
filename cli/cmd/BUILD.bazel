@@ -4,6 +4,7 @@ go_library(
     name = "cmd",
     srcs = [
         "lego.go",
+        "lego_parts.go",
         "lego_sets.go",
         "root.go",
         "sets.go",

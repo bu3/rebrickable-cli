@@ -1,0 +1,9 @@
+# Get a specific part
+exec cli lego parts get --part_num 3001
+stdout '"part_num": "3001"'
+! stderr .
+
+# List colors the part has appeared in
+exec cli lego parts colors --part_num 3001
+stdout '"count":'
+! stderr .

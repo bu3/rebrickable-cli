@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -766,5 +767,287 @@ func TestGetUserSetsPagination(t *testing.T) {
 	}
 	if result.Results[1].Set.SetNum != page2Set.Set.SetNum {
 		t.Errorf("GetUserSets() results[1].SetNum = %q, want %q", result.Results[1].Set.SetNum, page2Set.Set.SetNum)
+	}
+}
+
+func TestGetLegoParts(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   LegoPartsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns parts", LegoPartsResponse{Count: 1, Results: []PartDetail{{PartNum: "3001", Name: "Brick 2 x 4"}}}, 200, false},
+		{"server error", LegoPartsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoParts(PartsFilter{})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoParts() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoParts() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoPartsAppliesFilters(t *testing.T) {
+	var capturedQuery string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedQuery = r.URL.RawQuery
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(LegoPartsResponse{Count: 0})
+	}))
+	defer server.Close()
+
+	client := newClientWithBaseURL("key", "", server.URL)
+	_, err := client.GetLegoParts(PartsFilter{PartCatID: "5", ColorID: "4", Search: "brick"})
+	if err != nil {
+		t.Fatalf("GetLegoParts() unexpected error: %v", err)
+	}
+
+	for _, want := range []string{"part_cat_id=5", "color_id=4", "search=brick"} {
+		if !strings.Contains(capturedQuery, want) {
+			t.Errorf("GetLegoParts() query = %q, missing %q", capturedQuery, want)
+		}
+	}
+}
+
+func TestGetLegoPartsPagination(t *testing.T) {
+	page1 := PartDetail{PartNum: "3001"}
+	page2 := PartDetail{PartNum: "3002"}
+
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Query().Get("page") == "2" {
+			_ = json.NewEncoder(w).Encode(LegoPartsResponse{Count: 2, Results: []PartDetail{page2}})
+		} else {
+			_ = json.NewEncoder(w).Encode(LegoPartsResponse{Count: 2, Next: serverURL + "/?page=2", Results: []PartDetail{page1}})
+		}
+	}))
+	defer server.Close()
+	serverURL = server.URL
+
+	client := newClientWithBaseURL("key", "", server.URL)
+	result, err := client.GetLegoParts(PartsFilter{})
+	if err != nil {
+		t.Fatalf("GetLegoParts() unexpected error: %v", err)
+	}
+	if len(result.Results) != 2 {
+		t.Fatalf("GetLegoParts() len = %d, want 2", len(result.Results))
+	}
+	if result.Results[0].PartNum != page1.PartNum || result.Results[1].PartNum != page2.PartNum {
+		t.Errorf("GetLegoParts() pagination order wrong: %+v", result.Results)
+	}
+}
+
+func TestGetLegoPart(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   PartDetail
+		statusCode int
+		wantNil    bool
+		wantErr    bool
+	}{
+		{"returns part", PartDetail{PartNum: "3001", Name: "Brick 2 x 4"}, 200, false, false},
+		{"not found", PartDetail{}, 404, true, false},
+		{"server error", PartDetail{}, 500, true, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoPart("3001")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoPart() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if (result == nil) != tt.wantNil {
+				t.Errorf("GetLegoPart() nilResult = %v, wantNil %v", result == nil, tt.wantNil)
+			}
+			if !tt.wantErr && !tt.wantNil && result.PartNum != tt.response.PartNum {
+				t.Errorf("GetLegoPart() part_num = %v, want %v", result.PartNum, tt.response.PartNum)
+			}
+		})
+	}
+}
+
+func TestGetLegoPartColors(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   PartColorsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns colors", PartColorsResponse{Count: 1, Results: []PartColorDetail{{ColorID: 4, ColorName: "Red"}}}, 200, false},
+		{"server error", PartColorsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoPartColors("3001")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoPartColors() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoPartColors() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoPartColorsPagination(t *testing.T) {
+	page1 := PartColorDetail{ColorID: 4, ColorName: "Red"}
+	page2 := PartColorDetail{ColorID: 5, ColorName: "Blue"}
+
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Query().Get("page") == "2" {
+			_ = json.NewEncoder(w).Encode(PartColorsResponse{Count: 2, Results: []PartColorDetail{page2}})
+		} else {
+			_ = json.NewEncoder(w).Encode(PartColorsResponse{Count: 2, Next: serverURL + "/?page=2", Results: []PartColorDetail{page1}})
+		}
+	}))
+	defer server.Close()
+	serverURL = server.URL
+
+	client := newClientWithBaseURL("key", "", server.URL)
+	result, err := client.GetLegoPartColors("3001")
+	if err != nil {
+		t.Fatalf("GetLegoPartColors() unexpected error: %v", err)
+	}
+	if len(result.Results) != 2 {
+		t.Fatalf("GetLegoPartColors() len = %d, want 2", len(result.Results))
+	}
+}
+
+func TestGetLegoPartColor(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   PartColorDetail
+		statusCode int
+		wantNil    bool
+		wantErr    bool
+	}{
+		{"returns combination", PartColorDetail{ColorID: 4, ColorName: "Red", NumSets: 12}, 200, false, false},
+		{"not found", PartColorDetail{}, 404, true, false},
+		{"server error", PartColorDetail{}, 500, true, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoPartColor("3001", "4")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoPartColor() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if (result == nil) != tt.wantNil {
+				t.Errorf("GetLegoPartColor() nilResult = %v, wantNil %v", result == nil, tt.wantNil)
+			}
+			if !tt.wantErr && !tt.wantNil && result.ColorName != tt.response.ColorName {
+				t.Errorf("GetLegoPartColor() color_name = %v, want %v", result.ColorName, tt.response.ColorName)
+			}
+		})
+	}
+}
+
+func TestGetLegoPartColorSets(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   LegoSetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns sets", LegoSetsResponse{Count: 1, Results: []Set{{SetNum: "10497-1"}}}, 200, false},
+		{"server error", LegoSetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoPartColorSets("3001", "4")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoPartColorSets() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoPartColorSets() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoPartColorSetsPagination(t *testing.T) {
+	page1 := Set{SetNum: "10497-1"}
+	page2 := Set{SetNum: "75192-1"}
+
+	var serverURL string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Query().Get("page") == "2" {
+			_ = json.NewEncoder(w).Encode(LegoSetsResponse{Count: 2, Results: []Set{page2}})
+		} else {
+			_ = json.NewEncoder(w).Encode(LegoSetsResponse{Count: 2, Next: serverURL + "/?page=2", Results: []Set{page1}})
+		}
+	}))
+	defer server.Close()
+	serverURL = server.URL
+
+	client := newClientWithBaseURL("key", "", server.URL)
+	result, err := client.GetLegoPartColorSets("3001", "4")
+	if err != nil {
+		t.Fatalf("GetLegoPartColorSets() unexpected error: %v", err)
+	}
+	if len(result.Results) != 2 {
+		t.Fatalf("GetLegoPartColorSets() len = %d, want 2", len(result.Results))
 	}
 }

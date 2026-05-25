@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "api.go",
         "lego.go",
+        "lego_parts.go",
         "user.go",
     ],
     importpath = "github.com/bu3/rebrickable-cli/cli/cmd/api",

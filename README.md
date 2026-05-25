@@ -63,3 +63,15 @@ Requires only `REBRICKABLE_API_KEY` — no login needed.
 | `lego sets minifigs` | `-n <set_num>` | GET `/lego/sets/{set_num}/minifigs/` |
 | `lego sets parts` | `-n <set_num>` | GET `/lego/sets/{set_num}/parts/` |
 | `lego sets sets` | `-n <set_num>` | GET `/lego/sets/{set_num}/sets/` |
+
+### LEGO Catalog Parts (`lego parts`)
+
+Requires only `REBRICKABLE_API_KEY` — no login needed.
+
+| Command | Flag(s) | API |
+|---------|---------|-----|
+| `lego parts list` | `--part_num`, `--part_nums`, `--part_cat_id`, `--color_id`, `--bricklink_id`, `--brickowl_id`, `--lego_id`, `--ldraw_id`, `--ordering`, `--search` (all optional) | GET `/lego/parts/` |
+| `lego parts get` | `-n <part_num>` | GET `/lego/parts/{part_num}/` |
+| `lego parts colors` | `-n <part_num>` | GET `/lego/parts/{part_num}/colors/` |
+| `lego parts colorDetail` | `-n <part_num>` `-c <color_id>` | GET `/lego/parts/{part_num}/colors/{color_id}/` |
+| `lego parts colorSets` | `-n <part_num>` `-c <color_id>` | GET `/lego/parts/{part_num}/colors/{color_id}/sets/` |
