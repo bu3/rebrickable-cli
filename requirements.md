@@ -4,24 +4,29 @@ Derived from `openapi.spec.json`. **26 of 60 operations implemented** (43%).
 
 ---
 
-## LEGO Catalog (not yet implemented)
+## LEGO Catalog
 
 These are read-only, unauthenticated endpoints (API key only, no user token).
 
-### Colors
+**Implemented:** Parts (5), Sets (6) — 11 of 20 endpoints.
+**Not yet implemented:** Colors (2), Elements (1), Minifigs (4), Part Categories (2), Themes (2) — 9 of 20 endpoints.
+
+### Not yet implemented
+
+#### Colors
 
 | Method | Path |
 |--------|------|
 | GET | `/api/v3/lego/colors/` |
 | GET | `/api/v3/lego/colors/{id}/` |
 
-### Elements
+#### Elements
 
 | Method | Path |
 |--------|------|
 | GET | `/api/v3/lego/elements/{element_id}/` |
 
-### Minifigs
+#### Minifigs
 
 | Method | Path |
 |--------|------|
@@ -30,14 +35,23 @@ These are read-only, unauthenticated endpoints (API key only, no user token).
 | GET | `/api/v3/lego/minifigs/{set_num}/parts/` |
 | GET | `/api/v3/lego/minifigs/{set_num}/sets/` |
 
-### Part Categories
+#### Part Categories
+
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/api/v3/lego/part_categories/` | Change `extend-lego-catalog-part-categories` proposed, not yet applied |
+| GET | `/api/v3/lego/part_categories/{id}/` | Change `extend-lego-catalog-part-categories` proposed, not yet applied |
+
+#### Themes
 
 | Method | Path |
 |--------|------|
-| GET | `/api/v3/lego/part_categories/` |
-| GET | `/api/v3/lego/part_categories/{id}/` |
+| GET | `/api/v3/lego/themes/` |
+| GET | `/api/v3/lego/themes/{id}/` |
 
-### Parts ✅ implemented
+### Implemented ✅
+
+#### Parts ✅
 
 | Method | Path |
 |--------|------|
@@ -47,7 +61,7 @@ These are read-only, unauthenticated endpoints (API key only, no user token).
 | GET | `/api/v3/lego/parts/{part_num}/colors/{color_id}/` |
 | GET | `/api/v3/lego/parts/{part_num}/colors/{color_id}/sets/` |
 
-### Sets ✅ implemented
+#### Sets ✅
 
 | Method | Path |
 |--------|------|
@@ -57,13 +71,6 @@ These are read-only, unauthenticated endpoints (API key only, no user token).
 | GET | `/api/v3/lego/sets/{set_num}/minifigs/` |
 | GET | `/api/v3/lego/sets/{set_num}/parts/` |
 | GET | `/api/v3/lego/sets/{set_num}/sets/` |
-
-### Themes
-
-| Method | Path |
-|--------|------|
-| GET | `/api/v3/lego/themes/` |
-| GET | `/api/v3/lego/themes/{id}/` |
 
 ---
 
