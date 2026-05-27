@@ -181,5 +181,5 @@ type Element struct {
 	ElementID string    `json:"element_id"`
 	Part      Part      `json:"part"`
 	Color     PartColor `json:"color"`
-	DesignID  string    `json:"design_id"`
+	DesignID  string    `json:"design_id"` // not in OpenAPI spec but returned by the API
 }

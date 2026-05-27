@@ -1,4 +1,4 @@
 # Get a specific element by stable ID
 exec cli lego elements get --id 300101
-stdout '"element_id"'
+stdout '"element_id": "300101"'
 ! stderr .
