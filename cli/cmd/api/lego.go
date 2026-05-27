@@ -56,3 +56,25 @@ func (c *Client) GetLegoSetSets(setNum string) (*LegoSetsResponse, error) {
 	}
 	return &LegoSetsResponse{Count: count, Results: results}, nil
 }
+
+func (c *Client) GetLegoColors() (*ColorsResponse, error) {
+	count, results, err := fetchAllPages[PartColor](c.http, "/lego/colors/")
+	if err != nil {
+		return nil, fmt.Errorf("get lego colors: %w", err)
+	}
+	return &ColorsResponse{Count: count, Results: results}, nil
+}
+
+func (c *Client) GetLegoColor(id string) (*PartColor, error) {
+	result := &PartColor{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(fmt.Sprintf("/lego/colors/%s/", id))
+	if err != nil {
+		return nil, fmt.Errorf("get lego color request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get lego color failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
