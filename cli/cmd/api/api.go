@@ -176,3 +176,10 @@ type SetPartsResponse struct {
 	Previous string    `json:"previous"`
 	Results  []SetPart `json:"results"`
 }
+
+type Element struct {
+	ElementID string    `json:"element_id"`
+	Part      Part      `json:"part"`
+	Color     PartColor `json:"color"`
+	DesignID  string    `json:"design_id"`
+}

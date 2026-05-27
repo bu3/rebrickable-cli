@@ -1125,3 +1125,46 @@ func TestGetLegoColor(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLegoElement(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   Element
+		statusCode int
+		wantErr    bool
+	}{
+		{
+			"returns element",
+			Element{
+				ElementID: "4119739",
+				Part:      Part{PartNum: "3001", Name: "Brick 2 x 4"},
+				Color:     PartColor{ID: 1, Name: "Blue"},
+				DesignID:  "3001",
+			},
+			200, false,
+		},
+		{"not found", Element{}, 404, true},
+		{"server error", Element{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoElement("4119739")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoElement() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.ElementID != tt.response.ElementID {
+				t.Errorf("GetLegoElement() element_id = %v, want %v", result.ElementID, tt.response.ElementID)
+			}
+		})
+	}
+}
