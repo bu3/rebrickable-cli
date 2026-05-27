@@ -8,16 +8,10 @@ Derived from `openapi.spec.json`. **26 of 60 operations implemented** (43%).
 
 These are read-only, unauthenticated endpoints (API key only, no user token).
 
-**Implemented:** Parts (5), Sets (6), Colors (2) — 13 of 20 endpoints.
-**Not yet implemented:** Elements (1), Minifigs (4), Part Categories (2), Themes (2) — 7 of 20 endpoints.
+**Implemented:** Parts (5), Sets (6), Colors (2), Elements (1) — 14 of 20 endpoints.
+**Not yet implemented:** Minifigs (4), Part Categories (2), Themes (2) — 6 of 20 endpoints.
 
 ### Not yet implemented
-
-#### Elements
-
-| Method | Path |
-|--------|------|
-| GET | `/api/v3/lego/elements/{element_id}/` |
 
 #### Minifigs
 
@@ -50,6 +44,12 @@ These are read-only, unauthenticated endpoints (API key only, no user token).
 |--------|------|
 | GET | `/api/v3/lego/colors/` |
 | GET | `/api/v3/lego/colors/{id}/` |
+
+#### Elements ✅
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/elements/{element_id}/` |
 
 #### Parts ✅
 
