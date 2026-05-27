@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "lego.go",
         "lego_colors.go",
+        "lego_elements.go",
         "lego_parts.go",
         "lego_sets.go",
         "root.go",
