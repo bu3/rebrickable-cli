@@ -147,8 +147,17 @@ type Part struct {
 }
 
 type PartColor struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	RGB     string `json:"rgb"`
+	IsTrans bool   `json:"is_trans"`
+}
+
+type ColorsResponse struct {
+	Count    int         `json:"count"`
+	Next     string      `json:"next"`
+	Previous string      `json:"previous"`
+	Results  []PartColor `json:"results"`
 }
 
 type SetPart struct {

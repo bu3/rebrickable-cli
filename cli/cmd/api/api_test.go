@@ -1051,3 +1051,77 @@ func TestGetLegoPartColorSetsPagination(t *testing.T) {
 		t.Fatalf("GetLegoPartColorSets() len = %d, want 2", len(result.Results))
 	}
 }
+
+func TestGetLegoColors(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   ColorsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{
+			"returns colors",
+			ColorsResponse{Count: 2, Results: []PartColor{
+				{ID: 0, Name: "Black", RGB: "05131D", IsTrans: false},
+				{ID: 1, Name: "Blue", RGB: "0055BF", IsTrans: false},
+			}},
+			200, false,
+		},
+		{"server error", ColorsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoColors()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoColors() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoColors() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoColor(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   PartColor
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns color", PartColor{ID: 0, Name: "Black", RGB: "05131D", IsTrans: false}, 200, false},
+		{"not found", PartColor{}, 404, true},
+		{"server error", PartColor{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoColor("0")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoColor() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.ID != tt.response.ID {
+				t.Errorf("GetLegoColor() id = %v, want %v", result.ID, tt.response.ID)
+			}
+		})
+	}
+}
