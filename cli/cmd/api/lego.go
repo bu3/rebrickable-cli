@@ -78,3 +78,17 @@ func (c *Client) GetLegoColor(id string) (*PartColor, error) {
 	}
 	return result, nil
 }
+
+func (c *Client) GetLegoElement(elementID string) (*Element, error) {
+	result := &Element{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(fmt.Sprintf("/lego/elements/%s/", elementID))
+	if err != nil {
+		return nil, fmt.Errorf("get lego element request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get lego element failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
