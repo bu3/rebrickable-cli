@@ -1,0 +1,9 @@
+# List all colors
+exec cli lego colors list
+stdout '"count":'
+! stderr .
+
+# Get a specific color by stable ID
+exec cli lego colors get --id 0
+stdout '"name": "Black"'
+! stderr .
