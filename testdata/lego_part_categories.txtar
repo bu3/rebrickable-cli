@@ -1,0 +1,9 @@
+# List all part categories
+exec cli lego part-categories list
+stdout '"count":'
+! stderr .
+
+# Get a specific part category by stable ID
+exec cli lego part-categories get --id 1
+stdout '"id": 1'
+! stderr .

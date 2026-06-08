@@ -1,0 +1,9 @@
+# List all themes
+exec cli lego themes list
+stdout '"count":'
+! stderr .
+
+# Get a specific theme by stable ID
+exec cli lego themes get --id 1
+stdout '"id": 1'
+! stderr .
