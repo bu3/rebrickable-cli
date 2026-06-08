@@ -130,3 +130,47 @@ func (c *Client) GetLegoMinifigSets(figNum string) (*LegoSetsResponse, error) {
 	}
 	return &LegoSetsResponse{Count: count, Results: results}, nil
 }
+
+func (c *Client) GetLegoPartCategories() (*PartCategoriesResponse, error) {
+	count, results, err := fetchAllPages[PartCategory](c.http, "/lego/part_categories/")
+	if err != nil {
+		return nil, fmt.Errorf("get lego part categories: %w", err)
+	}
+	return &PartCategoriesResponse{Count: count, Results: results}, nil
+}
+
+func (c *Client) GetLegoPartCategory(id string) (*PartCategory, error) {
+	result := &PartCategory{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(fmt.Sprintf("/lego/part_categories/%s/", id))
+	if err != nil {
+		return nil, fmt.Errorf("get lego part category request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get lego part category failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
+
+func (c *Client) GetLegoThemes() (*ThemesResponse, error) {
+	count, results, err := fetchAllPages[Theme](c.http, "/lego/themes/")
+	if err != nil {
+		return nil, fmt.Errorf("get lego themes: %w", err)
+	}
+	return &ThemesResponse{Count: count, Results: results}, nil
+}
+
+func (c *Client) GetLegoTheme(id string) (*Theme, error) {
+	result := &Theme{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(fmt.Sprintf("/lego/themes/%s/", id))
+	if err != nil {
+		return nil, fmt.Errorf("get lego theme request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get lego theme failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
