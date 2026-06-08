@@ -183,3 +183,19 @@ type Element struct {
 	Color     PartColor `json:"color"`
 	DesignID  string    `json:"design_id"` // not in OpenAPI spec but returned by the API
 }
+
+type Minifig struct {
+	SetNum         string `json:"set_num"`
+	Name           string `json:"name"`
+	NumParts       int    `json:"num_parts"`
+	SetImgURL      string `json:"set_img_url"`
+	SetURL         string `json:"set_url"`
+	LastModifiedDt string `json:"last_modified_dt"`
+}
+
+type MinifigsResponse struct {
+	Count    int       `json:"count"`
+	Next     string    `json:"next"`
+	Previous string    `json:"previous"`
+	Results  []Minifig `json:"results"`
+}

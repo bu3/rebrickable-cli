@@ -1168,3 +1168,136 @@ func TestGetLegoElement(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLegoMinifigs(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   MinifigsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns minifigs", MinifigsResponse{Count: 1, Results: []Minifig{{SetNum: "fig-000001", Name: "Spaceman"}}}, 200, false},
+		{"server error", MinifigsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoMinifigs()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoMinifigs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoMinifigs() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoMinifig(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   Minifig
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns minifig", Minifig{SetNum: "fig-000001", Name: "Spaceman", NumParts: 4}, 200, false},
+		{"not found", Minifig{}, 404, true},
+		{"server error", Minifig{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoMinifig("fig-000001")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoMinifig() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.SetNum != tt.response.SetNum {
+				t.Errorf("GetLegoMinifig() set_num = %v, want %v", result.SetNum, tt.response.SetNum)
+			}
+		})
+	}
+}
+
+func TestGetLegoMinifigParts(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   SetPartsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns parts", SetPartsResponse{Count: 2, Results: []SetPart{{Quantity: 1, Part: Part{PartNum: "3001"}}}}, 200, false},
+		{"server error", SetPartsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoMinifigParts("fig-000001")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoMinifigParts() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoMinifigParts() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoMinifigSets(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   LegoSetsResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns sets", LegoSetsResponse{Count: 1, Results: []Set{{SetNum: "10497-1", Name: "Galaxy Explorer"}}}, 200, false},
+		{"server error", LegoSetsResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoMinifigSets("fig-000001")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoMinifigSets() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoMinifigSets() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
