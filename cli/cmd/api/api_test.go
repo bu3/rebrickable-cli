@@ -1301,3 +1301,137 @@ func TestGetLegoMinifigSets(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLegoPartCategories(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   PartCategoriesResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns categories", PartCategoriesResponse{Count: 1, Results: []PartCategory{{ID: 1, Name: "Baseplates", PartCount: 243}}}, 200, false},
+		{"server error", PartCategoriesResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoPartCategories()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoPartCategories() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoPartCategories() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoPartCategory(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   PartCategory
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns category", PartCategory{ID: 1, Name: "Baseplates", PartCount: 243}, 200, false},
+		{"not found", PartCategory{}, 404, true},
+		{"server error", PartCategory{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoPartCategory("1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoPartCategory() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.ID != tt.response.ID {
+				t.Errorf("GetLegoPartCategory() id = %v, want %v", result.ID, tt.response.ID)
+			}
+		})
+	}
+}
+
+func TestGetLegoThemes(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   ThemesResponse
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns themes", ThemesResponse{Count: 1, Results: []Theme{{ID: 1, Name: "Technic"}}}, 200, false},
+		{"server error", ThemesResponse{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoThemes()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoThemes() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.Count != tt.response.Count {
+				t.Errorf("GetLegoThemes() count = %v, want %v", result.Count, tt.response.Count)
+			}
+		})
+	}
+}
+
+func TestGetLegoTheme(t *testing.T) {
+	tests := []struct {
+		name       string
+		response   Theme
+		statusCode int
+		wantErr    bool
+	}{
+		{"returns theme", Theme{ID: 1, Name: "Technic"}, 200, false},
+		{"not found", Theme{}, 404, true},
+		{"server error", Theme{}, 500, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.statusCode)
+				if tt.statusCode == 200 {
+					_ = json.NewEncoder(w).Encode(tt.response)
+				}
+			}))
+			defer server.Close()
+
+			client := newClientWithBaseURL("key", "", server.URL)
+			result, err := client.GetLegoTheme("1")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetLegoTheme() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && result.ID != tt.response.ID {
+				t.Errorf("GetLegoTheme() id = %v, want %v", result.ID, tt.response.ID)
+			}
+		})
+	}
+}

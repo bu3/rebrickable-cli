@@ -199,3 +199,29 @@ type MinifigsResponse struct {
 	Previous string    `json:"previous"`
 	Results  []Minifig `json:"results"`
 }
+
+type PartCategory struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	PartCount int    `json:"part_count"`
+}
+
+type PartCategoriesResponse struct {
+	Count    int            `json:"count"`
+	Next     string         `json:"next"`
+	Previous string         `json:"previous"`
+	Results  []PartCategory `json:"results"`
+}
+
+type Theme struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	ParentID *int   `json:"parent_id"`
+}
+
+type ThemesResponse struct {
+	Count    int     `json:"count"`
+	Next     string  `json:"next"`
+	Previous string  `json:"previous"`
+	Results  []Theme `json:"results"`
+}
