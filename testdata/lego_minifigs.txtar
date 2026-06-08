@@ -1,0 +1,9 @@
+# List all minifigs
+exec cli lego minifigs list
+stdout '"count":'
+! stderr .
+
+# Get a specific minifig by fig_num
+exec cli lego minifigs get --fig_num fig-000001
+stdout '"set_num": "fig-000001"'
+! stderr .
