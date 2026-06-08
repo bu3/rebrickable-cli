@@ -8,24 +8,7 @@ Derived from `openapi.spec.json`. **26 of 60 operations implemented** (43%).
 
 These are read-only, unauthenticated endpoints (API key only, no user token).
 
-**Implemented:** Parts (5), Sets (6), Colors (2), Elements (1), Minifigs (4) — 18 of 20 endpoints.
-**Not yet implemented:** Part Categories (2), Themes (2) — 2 of 20 endpoints.
-
-### Not yet implemented
-
-#### Part Categories
-
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/api/v3/lego/part_categories/` | Change `extend-lego-catalog-part-categories` proposed, not yet applied |
-| GET | `/api/v3/lego/part_categories/{id}/` | Change `extend-lego-catalog-part-categories` proposed, not yet applied |
-
-#### Themes
-
-| Method | Path |
-|--------|------|
-| GET | `/api/v3/lego/themes/` |
-| GET | `/api/v3/lego/themes/{id}/` |
+**Implemented:** Parts (5), Sets (6), Colors (2), Elements (1), Minifigs (4), Part Categories (2), Themes (2) — 20 of 20 endpoints.
 
 ### Implemented ✅
 
@@ -50,6 +33,20 @@ These are read-only, unauthenticated endpoints (API key only, no user token).
 | GET | `/api/v3/lego/minifigs/{set_num}/` |
 | GET | `/api/v3/lego/minifigs/{set_num}/parts/` |
 | GET | `/api/v3/lego/minifigs/{set_num}/sets/` |
+
+#### Part Categories ✅
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/part_categories/` |
+| GET | `/api/v3/lego/part_categories/{id}/` |
+
+#### Themes ✅
+
+| Method | Path |
+|--------|------|
+| GET | `/api/v3/lego/themes/` |
+| GET | `/api/v3/lego/themes/{id}/` |
 
 #### Parts ✅
 
