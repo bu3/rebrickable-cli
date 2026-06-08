@@ -92,3 +92,41 @@ func (c *Client) GetLegoElement(elementID string) (*Element, error) {
 	}
 	return result, nil
 }
+
+func (c *Client) GetLegoMinifigs() (*MinifigsResponse, error) {
+	count, results, err := fetchAllPages[Minifig](c.http, "/lego/minifigs/")
+	if err != nil {
+		return nil, fmt.Errorf("get lego minifigs: %w", err)
+	}
+	return &MinifigsResponse{Count: count, Results: results}, nil
+}
+
+func (c *Client) GetLegoMinifig(figNum string) (*Minifig, error) {
+	result := &Minifig{}
+	resp, err := c.http.R().
+		SetResult(result).
+		Get(fmt.Sprintf("/lego/minifigs/%s/", figNum))
+	if err != nil {
+		return nil, fmt.Errorf("get lego minifig request failed: %w", err)
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("get lego minifig failed with status %d", resp.StatusCode())
+	}
+	return result, nil
+}
+
+func (c *Client) GetLegoMinifigParts(figNum string) (*SetPartsResponse, error) {
+	count, results, err := fetchAllPages[SetPart](c.http, fmt.Sprintf("/lego/minifigs/%s/parts/", figNum))
+	if err != nil {
+		return nil, fmt.Errorf("get lego minifig parts: %w", err)
+	}
+	return &SetPartsResponse{Count: count, Results: results}, nil
+}
+
+func (c *Client) GetLegoMinifigSets(figNum string) (*LegoSetsResponse, error) {
+	count, results, err := fetchAllPages[Set](c.http, fmt.Sprintf("/lego/minifigs/%s/sets/", figNum))
+	if err != nil {
+		return nil, fmt.Errorf("get lego minifig sets: %w", err)
+	}
+	return &LegoSetsResponse{Count: count, Results: results}, nil
+}
