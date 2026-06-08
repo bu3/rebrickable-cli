@@ -6,6 +6,7 @@ go_library(
         "lego.go",
         "lego_colors.go",
         "lego_elements.go",
+        "lego_minifigs.go",
         "lego_parts.go",
         "lego_sets.go",
         "root.go",
