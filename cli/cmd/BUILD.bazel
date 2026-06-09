@@ -18,8 +18,7 @@ go_library(
     importpath = "github.com/bu3/rebrickable-cli/cli/cmd",
     visibility = ["//visibility:public"],
     deps = [
-        "//cli/cmd/api",
-        "@com_github_go_resty_resty_v2//:resty",
+        "@com_github_bu3_rebrickable_go//:rebrickable-go",
         "@com_github_spf13_cobra//:cobra",
         "@org_golang_x_net//context",
     ],
