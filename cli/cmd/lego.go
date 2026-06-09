@@ -3,12 +3,10 @@ package cmd
 import (
 	"os"
 
-	"github.com/bu3/rebrickable-cli/cli/cmd/api"
+	rebrickable "github.com/bu3/rebrickable-go"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
-
-const LegoApiKey = "lego_api_key"
 
 func init() {
 	rootCmd.AddCommand(legoCmd)
@@ -19,13 +17,12 @@ var legoCmd = &cobra.Command{
 	Short: "LEGO catalog actions",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		apiKey := os.Getenv("REBRICKABLE_API_KEY")
-		ctx := context.WithValue(cmd.Context(), LegoApiKey, apiKey)
-		cmd.SetContext(ctx)
+		client := rebrickable.NewClient(apiKey)
+		cmd.SetContext(context.WithValue(cmd.Context(), rebrickableClient, client))
 		return nil
 	},
 }
 
-func newLegoAPIClient(cmd *cobra.Command) *api.Client {
-	apiKey := cmd.Context().Value(LegoApiKey).(string)
-	return api.NewLegoClient(apiKey)
+func newLegoAPIClient(cmd *cobra.Command) *rebrickable.Client {
+	return cmd.Context().Value(rebrickableClient).(*rebrickable.Client)
 }
