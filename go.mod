@@ -1,15 +1,13 @@
 module github.com/bu3/rebrickable-cli
 
-go 1.23.0
-
-toolchain go1.24.1
+go 1.25.0
 
 require (
 	github.com/bu3/rebrickable-go v0.1.0
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/rogpeppe/go-internal v1.13.1
 	github.com/spf13/cobra v1.8.1
-	golang.org/x/net v0.55.0
+	golang.org/x/net v0.43.0
 )
 
 require (
