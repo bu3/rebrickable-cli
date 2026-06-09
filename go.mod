@@ -3,7 +3,7 @@ module github.com/bu3/rebrickable-cli
 go 1.25.0
 
 require (
-	github.com/bu3/rebrickable-go v0.1.0
+	github.com/bu3/rebrickable-go v0.2.0
 	github.com/rogpeppe/go-internal v1.13.1
 	github.com/spf13/cobra v1.8.1
 )
