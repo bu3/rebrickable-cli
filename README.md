@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="rebrickable-go-logo.png" alt="rebrickable-go" width="200">
+</p>
+
 # Rebrickable Go Client
 
 Client to interact with [Rebrickable API](https://rebrickable.com/api/v3/docs/?key=).
