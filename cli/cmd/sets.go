@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bu3/rebrickable-cli/cli/cmd/api"
+	rebrickable "github.com/bu3/rebrickable-go"
 	"github.com/spf13/cobra"
 )
 
@@ -69,10 +69,8 @@ func setListSetsCommands() {
 	deleteSetListSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 }
 
-func newAPIClient(cmd *cobra.Command) *api.Client {
-	authToken := cmd.Context().Value(AuthToken).(string)
-	apiKey := cmd.Context().Value(ApiKey).(string)
-	return api.NewClient(apiKey, authToken)
+func newAPIClient(cmd *cobra.Command) *rebrickable.Client {
+	return cmd.Context().Value(rebrickableClient).(*rebrickable.Client)
 }
 
 var setListsCmd = &cobra.Command{
@@ -85,7 +83,11 @@ var saveSetListCmd = &cobra.Command{
 	Short: "set",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.StoreUserSetList(setListName)
+		if err := client.StoreUserSetList(setListName); err != nil {
+			return err
+		}
+		fmt.Println("SetList saved")
+		return nil
 	},
 }
 
@@ -112,7 +114,11 @@ var deleteSetListsCmd = &cobra.Command{
 	Short: "delete",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.DeleteUserSetList(setNumber)
+		if err := client.DeleteUserSetList(setNumber); err != nil {
+			return err
+		}
+		fmt.Printf("Deleted set list: %s\n", setNumber)
+		return nil
 	},
 }
 
@@ -144,7 +150,11 @@ var deleteSetsCmd = &cobra.Command{
 	Short: "delete",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.DeleteUserSet(adjustedSetNumber())
+		if err := client.DeleteUserSet(adjustedSetNumber()); err != nil {
+			return err
+		}
+		fmt.Printf("Deleted set: %s\n", adjustedSetNumber())
+		return nil
 	},
 }
 
@@ -153,7 +163,11 @@ var saveSetsCmd = &cobra.Command{
 	Short: "set",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.StoreUserSet(adjustedSetNumber())
+		if err := client.StoreUserSet(adjustedSetNumber()); err != nil {
+			return err
+		}
+		fmt.Println("Set saved")
+		return nil
 	},
 }
 
@@ -180,7 +194,11 @@ var updateSetListCmd = &cobra.Command{
 	Short: "update",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.UpdateUserSetList(setListID, setListName)
+		if err := client.UpdateUserSetList(setListID, setListName); err != nil {
+			return err
+		}
+		fmt.Printf("Updated set list: %s\n", setListID)
+		return nil
 	},
 }
 
@@ -189,7 +207,11 @@ var replaceSetListCmd = &cobra.Command{
 	Short: "replace",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.ReplaceUserSetList(setListID, setListName)
+		if err := client.ReplaceUserSetList(setListID, setListName); err != nil {
+			return err
+		}
+		fmt.Printf("Replaced set list: %s\n", setListID)
+		return nil
 	},
 }
 
@@ -239,7 +261,11 @@ var saveSetListSetCmd = &cobra.Command{
 	Short: "set",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.StoreUserSetListSet(setListID, adjustedSetNumber())
+		if err := client.StoreUserSetListSet(setListID, adjustedSetNumber()); err != nil {
+			return err
+		}
+		fmt.Println("Set added to set list")
+		return nil
 	},
 }
 
@@ -248,7 +274,11 @@ var deleteSetListSetCmd = &cobra.Command{
 	Short: "delete",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.DeleteUserSetListSet(setListID, adjustedSetNumber())
+		if err := client.DeleteUserSetListSet(setListID, adjustedSetNumber()); err != nil {
+			return err
+		}
+		fmt.Printf("Deleted %s from set list %s\n", adjustedSetNumber(), setListID)
+		return nil
 	},
 }
 
@@ -275,7 +305,11 @@ var replaceSetCmd = &cobra.Command{
 	Short: "replace",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := newAPIClient(cmd)
-		return client.ReplaceUserSet(adjustedSetNumber(), quantity)
+		if err := client.ReplaceUserSet(adjustedSetNumber(), quantity); err != nil {
+			return err
+		}
+		fmt.Printf("Updated set: %s\n", adjustedSetNumber())
+		return nil
 	},
 }
 
