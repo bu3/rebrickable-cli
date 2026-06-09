@@ -8,4 +8,5 @@
 bazel test --action_env=REBRICKABLE_USERNAME=$REBRICKABLE_USERNAME \
  --action_env=REBRICKABLE_PASSWORD=$REBRICKABLE_PASSWORD \
  --action_env=REBRICKABLE_API_KEY=$REBRICKABLE_API_KEY \
+ --test_arg=-test.parallel=1 \
  //...
