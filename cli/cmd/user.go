@@ -1,74 +1,36 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/bu3/rebrickable-cli/cli/cmd/api"
-	"github.com/go-resty/resty/v2"
+	rebrickable "github.com/bu3/rebrickable-go"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
+
+type contextKey string
+
+const rebrickableClient contextKey = "rebrickable_client"
 
 func init() {
 	rootCmd.AddCommand(user)
 }
 
-const (
-	ApiKey    = "api_key"
-	AuthToken = "auth_token"
-)
-
 var user = &cobra.Command{
 	Use:   "user",
 	Short: "user actions",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		client := resty.New()
-		authToken, err := login(client)
-
+		apiKey := os.Getenv("REBRICKABLE_API_KEY")
+		username := os.Getenv("REBRICKABLE_USERNAME")
+		password := os.Getenv("REBRICKABLE_PASSWORD")
+		client, err := rebrickable.NewAuthenticatedClient(apiKey, username, password)
 		if err != nil {
 			return err
 		}
-
-		ctx := context.WithValue(cmd.Context(), AuthToken, authToken.UserToken)
-		ctx = context.WithValue(ctx, ApiKey, authToken.ApiKey)
-		cmd.SetContext(ctx)
+		cmd.SetContext(context.WithValue(cmd.Context(), rebrickableClient, client))
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},
-}
-
-func login(client *resty.Client) (*authToken, error) {
-	username := os.Getenv("REBRICKABLE_USERNAME")
-	password := os.Getenv("REBRICKABLE_PASSWORD")
-	apiKey := os.Getenv("REBRICKABLE_API_KEY")
-	authToken := &authToken{
-		ApiKey: apiKey,
-	}
-
-	resp, err := client.R().
-		SetHeader("Content-Type", "application/x-www-form-urlencoded").
-		SetHeader("Authorization", fmt.Sprintf("key %s", apiKey)).
-		SetFormData(map[string]string{
-			"username": username,
-			"password": password,
-		}).
-		SetResult(authToken).
-		Post(api.GetURL("/users/_token/"))
-
-	if err != nil {
-		return nil, fmt.Errorf("login request failed: %w", err)
-	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("login failed with status %d", resp.StatusCode())
-	}
-
-	return authToken, nil
-}
-
-type authToken struct {
-	UserToken string `json:"user_token"`
-	ApiKey    string
 }
