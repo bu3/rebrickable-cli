@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bu3/rebrickable-cli/cli/cmd/api"
+	rebrickable "github.com/bu3/rebrickable-go"
 	"github.com/spf13/cobra"
 )
 
 var (
 	partNumber  string
 	partColorID string
-	partsFilter api.PartsFilter
+	partsFilter rebrickable.PartsFilter
 )
 
 func init() {
@@ -81,9 +81,6 @@ var getLegoPartCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if result == nil {
-			return nil
-		}
 		return printJSON(result)
 	},
 }
@@ -109,9 +106,6 @@ var getLegoPartColorCmd = &cobra.Command{
 		result, err := client.GetLegoPartColor(partNumber, partColorID)
 		if err != nil {
 			return err
-		}
-		if result == nil {
-			return nil
 		}
 		return printJSON(result)
 	},
