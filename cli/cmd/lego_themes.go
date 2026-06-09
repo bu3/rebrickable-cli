@@ -28,7 +28,7 @@ var getLegoThemesCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all themes",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoThemes()
 		if err != nil {
 			return err
@@ -41,7 +41,7 @@ var getLegoThemeCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get a theme by id",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoTheme(themeID)
 		if err != nil {
 			return err

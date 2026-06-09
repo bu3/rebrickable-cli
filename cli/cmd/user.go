@@ -5,7 +5,7 @@ import (
 
 	rebrickable "github.com/bu3/rebrickable-go"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
+	"context"
 )
 
 type contextKey string

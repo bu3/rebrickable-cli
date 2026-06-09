@@ -36,7 +36,7 @@ var getLegoSetsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoSets()
 		if err != nil {
 			return err
@@ -54,7 +54,7 @@ var getLegoSetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoSet(adjustedSetNumber())
 		if err != nil {
 			return err
@@ -72,7 +72,7 @@ var getLegoSetAlternatesCmd = &cobra.Command{
 	Use:   "alternates",
 	Short: "alternates",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoSetAlternates(adjustedSetNumber())
 		if err != nil {
 			return err
@@ -90,7 +90,7 @@ var getLegoSetMinifigsCmd = &cobra.Command{
 	Use:   "minifigs",
 	Short: "minifigs",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoSetMinifigs(adjustedSetNumber())
 		if err != nil {
 			return err
@@ -108,7 +108,7 @@ var getLegoSetPartsCmd = &cobra.Command{
 	Use:   "parts",
 	Short: "parts",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoSetParts(adjustedSetNumber())
 		if err != nil {
 			return err
@@ -126,7 +126,7 @@ var getLegoSetSetsCmd = &cobra.Command{
 	Use:   "sets",
 	Short: "sets",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoSetSets(adjustedSetNumber())
 		if err != nil {
 			return err

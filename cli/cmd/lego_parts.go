@@ -63,7 +63,7 @@ var getLegoPartsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list parts (supports filters)",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoParts(partsFilter)
 		if err != nil {
 			return err
@@ -76,7 +76,7 @@ var getLegoPartCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get a part by part_num",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoPart(partNumber)
 		if err != nil {
 			return err
@@ -89,7 +89,7 @@ var getLegoPartColorsCmd = &cobra.Command{
 	Use:   "colors",
 	Short: "list colors a part has appeared in",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoPartColors(partNumber)
 		if err != nil {
 			return err
@@ -102,7 +102,7 @@ var getLegoPartColorCmd = &cobra.Command{
 	Use:   "colorDetail",
 	Short: "get a specific part/color combination",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoPartColor(partNumber, partColorID)
 		if err != nil {
 			return err
@@ -115,7 +115,7 @@ var getLegoPartColorSetsCmd = &cobra.Command{
 	Use:   "colorSets",
 	Short: "list sets containing a part/color combination",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoPartColorSets(partNumber, partColorID)
 		if err != nil {
 			return err

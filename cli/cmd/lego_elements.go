@@ -27,7 +27,7 @@ var getLegoElementCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get an element by id",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoElement(elementID)
 		if err != nil {
 			return err

@@ -3,9 +3,10 @@ package cmd
 import (
 	"os"
 
+	"context"
+
 	rebrickable "github.com/bu3/rebrickable-go"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func init() {
@@ -21,8 +22,4 @@ var legoCmd = &cobra.Command{
 		cmd.SetContext(context.WithValue(cmd.Context(), rebrickableClient, client))
 		return nil
 	},
-}
-
-func newLegoAPIClient(cmd *cobra.Command) *rebrickable.Client {
-	return cmd.Context().Value(rebrickableClient).(*rebrickable.Client)
 }

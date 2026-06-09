@@ -36,7 +36,7 @@ var getLegoMinifigsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all minifigs",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoMinifigs()
 		if err != nil {
 			return err
@@ -49,7 +49,7 @@ var getLegoMinifigCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get a minifig by fig_num",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoMinifig(figNum)
 		if err != nil {
 			return err
@@ -62,7 +62,7 @@ var getLegoMinifigPartsCmd = &cobra.Command{
 	Use:   "parts",
 	Short: "list parts of a minifig",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoMinifigParts(figNum)
 		if err != nil {
 			return err
@@ -75,7 +75,7 @@ var getLegoMinifigSetsCmd = &cobra.Command{
 	Use:   "sets",
 	Short: "list sets containing a minifig",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoMinifigSets(figNum)
 		if err != nil {
 			return err

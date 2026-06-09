@@ -28,7 +28,7 @@ var getLegoPartCategoriesCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all part categories",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoPartCategories()
 		if err != nil {
 			return err
@@ -41,7 +41,7 @@ var getLegoPartCategoryCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get a part category by id",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoPartCategory(partCategoryID)
 		if err != nil {
 			return err

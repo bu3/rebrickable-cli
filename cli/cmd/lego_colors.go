@@ -28,7 +28,7 @@ var getLegoColorsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all colors",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoColors()
 		if err != nil {
 			return err
@@ -41,7 +41,7 @@ var getLegoColorCmd = &cobra.Command{
 	Use:   "get",
 	Short: "get a color by id",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := newLegoAPIClient(cmd)
+		client := newAPIClient(cmd)
 		result, err := client.GetLegoColor(colorID)
 		if err != nil {
 			return err
