@@ -13,6 +13,7 @@ var setNumber string
 var setListName string
 var setListID string
 var quantity int
+var includeSpares bool
 
 func init() {
 	setListsCommands()
@@ -27,12 +28,14 @@ func setCommands() {
 	setsCmd.AddCommand(saveSetsCmd)
 	setsCmd.AddCommand(replaceSetCmd)
 	setsCmd.AddCommand(deleteSetsCmd)
+	setsCmd.AddCommand(syncSetsCmd)
 
 	saveSetsCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 	deleteSetsCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 	getSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 	replaceSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 	replaceSetCmd.Flags().IntVarP(&quantity, "quantity", "q", 1, "Quantity")
+	syncSetsCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 }
 
 func setListsCommands() {
@@ -59,6 +62,8 @@ func setListSetsCommands() {
 	setListSetsCmd.AddCommand(getSetListSetCmd)
 	setListSetsCmd.AddCommand(saveSetListSetCmd)
 	setListSetsCmd.AddCommand(deleteSetListSetCmd)
+	setListSetsCmd.AddCommand(updateSetListSetCmd)
+	setListSetsCmd.AddCommand(replaceSetListSetCmd)
 
 	getSetListSetsCmd.Flags().StringVarP(&setListID, "set_list_id", "l", "", "Set List id")
 	getSetListSetCmd.Flags().StringVarP(&setListID, "set_list_id", "l", "", "Set List id")
@@ -67,6 +72,14 @@ func setListSetsCommands() {
 	saveSetListSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
 	deleteSetListSetCmd.Flags().StringVarP(&setListID, "set_list_id", "l", "", "Set List id")
 	deleteSetListSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
+	updateSetListSetCmd.Flags().StringVarP(&setListID, "set_list_id", "l", "", "Set List id")
+	updateSetListSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
+	updateSetListSetCmd.Flags().IntVarP(&quantity, "quantity", "q", 1, "Quantity")
+	updateSetListSetCmd.Flags().BoolVar(&includeSpares, "include_spares", false, "Include spare parts")
+	replaceSetListSetCmd.Flags().StringVarP(&setListID, "set_list_id", "l", "", "Set List id")
+	replaceSetListSetCmd.Flags().StringVarP(&setNumber, "set_num", "n", "", "Set number")
+	replaceSetListSetCmd.Flags().IntVarP(&quantity, "quantity", "q", 1, "Quantity")
+	replaceSetListSetCmd.Flags().BoolVar(&includeSpares, "include_spares", false, "Include spare parts")
 }
 
 func newAPIClient(cmd *cobra.Command) *rebrickable.Client {
@@ -319,4 +332,43 @@ func adjustedSetNumber() string {
 	}
 
 	return setNumber
+}
+
+var syncSetsCmd = &cobra.Command{
+	Use:   "sync",
+	Short: "sync",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := newAPIClient(cmd)
+		if err := client.SyncUserSet(adjustedSetNumber()); err != nil {
+			return err
+		}
+		fmt.Printf("Synced set: %s\n", adjustedSetNumber())
+		return nil
+	},
+}
+
+var updateSetListSetCmd = &cobra.Command{
+	Use:   "update",
+	Short: "update",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := newAPIClient(cmd)
+		if err := client.UpdateUserSetListSet(setListID, adjustedSetNumber(), quantity, includeSpares); err != nil {
+			return err
+		}
+		fmt.Println("Updated set in set list")
+		return nil
+	},
+}
+
+var replaceSetListSetCmd = &cobra.Command{
+	Use:   "replace",
+	Short: "replace",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := newAPIClient(cmd)
+		if err := client.ReplaceUserSetListSet(setListID, adjustedSetNumber(), quantity, includeSpares); err != nil {
+			return err
+		}
+		fmt.Println("Replaced set in set list")
+		return nil
+	},
 }
