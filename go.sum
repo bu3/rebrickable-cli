@@ -1,5 +1,5 @@
-github.com/bu3/rebrickable-go v0.3.0 h1:JOFmeIV7uyu1RwKOhxWsdKEKZW+sJQlg1hFWUK3ENl4=
-github.com/bu3/rebrickable-go v0.3.0/go.mod h1:nCfLImPF7xpD9htpWYa70mYHR+SbDtR/WyoVovEC9tw=
+github.com/bu3/rebrickable-go v0.3.1 h1:tpr0E7tODyjZn2VTf7lGuTdwEw/u2f6Ikxq4YuEQX8o=
+github.com/bu3/rebrickable-go v0.3.1/go.mod h1:nCfLImPF7xpD9htpWYa70mYHR+SbDtR/WyoVovEC9tw=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/go-resty/resty/v2 v2.17.2 h1:FQW5oHYcIlkCNrMD2lloGScxcHJ0gkjshV3qcQAyHQk=
 github.com/go-resty/resty/v2 v2.17.2/go.mod h1:kCKZ3wWmwJaNc7S29BRtUhJwy7iqmn+2mLtQrOyQlVA=
