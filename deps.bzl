@@ -4,8 +4,8 @@ def go_dependencies():
     go_repository(
         name = "com_github_bu3_rebrickable_go",
         importpath = "github.com/bu3/rebrickable-go",
-        sum = "h1:ubVRNz14RppMeEMxydj0j9pmAtzQ082gIPnr2ImKJCA=",
-        version = "v0.2.0",
+        sum = "h1:JOFmeIV7uyu1RwKOhxWsdKEKZW+sJQlg1hFWUK3ENl4=",
+        version = "v0.3.0",
     )
     go_repository(
         name = "com_github_cpuguy83_go_md2man_v2",
